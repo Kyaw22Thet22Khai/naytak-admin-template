@@ -1,0 +1,33 @@
+/* Invoices feature styles */
+
+.invoice-detail__title {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.invoice-detail__rows {
+  display: flex;
+  flex-direction: column;
+  margin-top: 12px;
+}
+
+.invoice-detail__row {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+}
+
+.invoice-detail__row + .invoice-detail__row {
+  border-top: 1px solid var(--naytak-border, #e5e7eb);
+}
+
+.invoice-detail__row span {
+  color: var(--naytak-text-muted, #6b7280);
+  font-size: 0.875rem;
+}
+
+.invoice-detail__row strong {
+  font-weight: 600;
+}

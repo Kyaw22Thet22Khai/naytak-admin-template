@@ -1,0 +1,50 @@
+/* Projects feature styles */
+
+.project-card .card-body {
+  width: 100%;
+}
+
+.project-card__head {
+  align-items: flex-start;
+  display: flex;
+  gap: 12px;
+}
+
+.project-card__icon {
+  align-items: center;
+  background: var(--naytak-primary-soft, rgba(37, 99, 235, 0.12));
+  border-radius: 0.6rem;
+  color: var(--naytak-primary, #2563eb);
+  display: flex;
+  flex-shrink: 0;
+  height: 44px;
+  justify-content: center;
+  width: 44px;
+}
+
+.project-card__name {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.project-card__description {
+  color: var(--naytak-text-muted, #6b7280);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  margin-top: 2px;
+}
+
+.project-card__meta {
+  color: var(--naytak-text-muted, #6b7280);
+  font-size: 0.8125rem;
+}
+
+.project-card__team {
+  display: flex;
+  margin-top: 12px;
+}
+
+.project-card__team .avatar + .avatar {
+  margin-left: -8px;
+}

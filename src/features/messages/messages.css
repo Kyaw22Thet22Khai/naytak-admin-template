@@ -1,0 +1,69 @@
+/* Messages feature styles */
+
+.message-row {
+  align-items: center;
+  border-bottom: 1px solid var(--naytak-border, #e5e7eb);
+  display: flex;
+  gap: 12px;
+  padding: 12px 0;
+}
+
+.message-row:first-of-type {
+  padding-top: 4px;
+}
+
+.message-row:last-of-type {
+  border-bottom: none;
+  padding-bottom: 4px;
+}
+
+.message-row__indicator {
+  background: var(--naytak-primary, #2563eb);
+  border-radius: 9999px;
+  flex-shrink: 0;
+  height: 8px;
+  width: 8px;
+}
+
+.message-row__body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.message-row__head {
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.message-row__sender {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.message-row__sender--unread {
+  font-weight: 700;
+}
+
+.message-row__time {
+  color: var(--naytak-text-muted, #6b7280);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.message-row__subject {
+  font-size: 0.875rem;
+  margin-top: 1px;
+}
+
+.message-row__subject--unread {
+  font-weight: 600;
+}
+
+.message-row__snippet {
+  color: var(--naytak-text-muted, #6b7280);
+  font-size: 0.8125rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

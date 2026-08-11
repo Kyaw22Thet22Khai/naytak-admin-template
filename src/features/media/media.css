@@ -1,0 +1,32 @@
+/* Media (files) feature styles */
+
+.file-card .card-body {
+  width: 100%;
+}
+
+.file-card__icon {
+  align-items: center;
+  background: var(--naytak-surface-2, rgba(0, 0, 0, 0.05));
+  border-radius: 0.6rem;
+  color: var(--naytak-primary, #2563eb);
+  display: flex;
+  flex-shrink: 0;
+  height: 48px;
+  justify-content: center;
+  width: 48px;
+}
+
+.file-card__name {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-card__meta {
+  color: var(--naytak-text-muted, #6b7280);
+  font-size: 0.8125rem;
+  margin-top: 2px;
+}

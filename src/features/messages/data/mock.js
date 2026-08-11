@@ -1,0 +1,122 @@
+/**
+ * Local mock data for the Messages feature.
+ * Swap this folder for a real API/data layer later.
+ */
+
+export const MESSAGES = [
+  {
+    id: 1,
+    sender: "Alice Johnson",
+    email: "alice@naytak.io",
+    subject: "Q3 budget review",
+    snippet: "Hi, could you review the Q3 budget draft before Friday?",
+    time: "2026-08-11T09:30:00",
+    unread: true,
+  },
+  {
+    id: 2,
+    sender: "Bob Smith",
+    email: "bob@naytak.io",
+    subject: "Server maintenance window",
+    snippet: "We have a planned maintenance window on Saturday 02:00 UTC.",
+    time: "2026-08-11T08:15:00",
+    unread: true,
+  },
+  {
+    id: 3,
+    sender: "Carol Nguyen",
+    email: "carol@naytak.io",
+    subject: "Invoice INV-2026-018 sent",
+    snippet:
+      "The invoice for the Q2 subscription has been sent to your finance team.",
+    time: "2026-08-10T17:40:00",
+    unread: false,
+  },
+  {
+    id: 4,
+    sender: "David Lee",
+    email: "david@naytak.io",
+    subject: "New feature request",
+    snippet: "Customers are asking for bulk export — any thoughts on timing?",
+    time: "2026-08-10T14:05:00",
+    unread: true,
+  },
+  {
+    id: 5,
+    sender: "Emma Wilson",
+    email: "emma@naytak.io",
+    subject: "Weekly digest",
+    snippet: "Here is your weekly summary: 124 new orders, 348 new customers.",
+    time: "2026-08-10T07:00:00",
+    unread: false,
+  },
+  {
+    id: 6,
+    sender: "Frank Miller",
+    email: "frank@naytak.io",
+    subject: "Design tokens update",
+    snippet: "I pushed the updated design tokens to the UI library.",
+    time: "2026-08-09T16:22:00",
+    unread: false,
+  },
+  {
+    id: 7,
+    sender: "Grace Brown",
+    email: "grace@naytak.io",
+    subject: "Security audit results",
+    snippet: "The penetration test came back clean — one low-risk finding.",
+    time: "2026-08-09T11:45:00",
+    unread: true,
+  },
+  {
+    id: 8,
+    sender: "Henry Davis",
+    email: "henry@naytak.io",
+    subject: "Holiday schedule",
+    snippet: "Please confirm your leave dates for the August long weekend.",
+    time: "2026-08-08T13:10:00",
+    unread: false,
+  },
+  {
+    id: 9,
+    sender: "Isabella Garcia",
+    email: "isabella@naytak.io",
+    subject: "Customer feedback roundup",
+    snippet: "Attaching the latest NPS responses and key takeaways.",
+    time: "2026-08-08T09:55:00",
+    unread: false,
+  },
+  {
+    id: 10,
+    sender: "Jack Martinez",
+    email: "jack@naytak.io",
+    subject: "Vendor contract renewal",
+    snippet: "The Aurelia contract expires next month — time to renegotiate.",
+    time: "2026-08-07T15:30:00",
+    unread: true,
+  },
+  {
+    id: 11,
+    sender: "Katie Anderson",
+    email: "katie@naytak.io",
+    subject: "Onboarding flow QA",
+    snippet: "Found a couple of edge cases in the new sign-up flow.",
+    time: "2026-08-07T10:20:00",
+    unread: false,
+  },
+  {
+    id: 12,
+    sender: "Liam Thomas",
+    email: "liam@naytak.io",
+    subject: "Invoice overdue notice",
+    snippet: "INV-2026-016 is now past due. Reminder sent to the client.",
+    time: "2026-08-06T12:00:00",
+    unread: false,
+  },
+];
+
+export const FOLDER_OPTIONS = [
+  { label: "All messages", value: "all" },
+  { label: "Unread", value: "unread" },
+  { label: "Read", value: "read" },
+];

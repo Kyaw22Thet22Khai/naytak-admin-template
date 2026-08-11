@@ -1,13 +1,157 @@
+/* Global base styles for the admin panel. */
+
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
+    "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family:
+    source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+/* PageHeader shared styles */
+.page-header__title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.page-header__subtitle {
+  margin: 4px 0 0;
+  opacity: 0.7;
+}
+
+/* PageLoader shared styles */
+.page-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+}
+
+/* Margin-bottom utilities (Bootstrap-style scale) */
+.mb-0 {
+  margin-bottom: 0;
+}
+.mb-1 {
+  margin-bottom: 0.25rem;
+}
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+.mb-3 {
+  margin-bottom: 1rem;
+}
+.mb-4 {
+  margin-bottom: 1.5rem;
+}
+
+/* Margin-top utilities */
+.mt-1 {
+  margin-top: 0.25rem;
+}
+.mt-2 {
+  margin-top: 0.5rem;
+}
+.mt-3 {
+  margin-top: 1rem;
+}
+.mt-4 {
+  margin-top: 1.5rem;
+}
+
+/* Height utilities */
+.h-100 {
+  height: 100%;
+}
+
+/* Table scroll wrapper — keeps the table full-width (table layout) with
+   horizontal scroll only when content overflows on small screens */
+.table-scroll {
+  overflow-x: auto;
+}
+
+/* List-page shared styles (Users, Orders, …) */
+.list-meta {
+  color: var(--naytak-text-muted, #6b7280);
+  font-size: 0.75rem;
+  line-height: 1.3;
+}
+
+.list-toolbar {
+  align-items: flex-end;
+}
+
+.list-pagination {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 12px;
+}
+
+/* Modals must sit above the fixed dashboard footer (z-index: 100) and navbar
+   (z-index: 99). The library's .modal root uses isolation:isolate (z-auto) so
+   it paints below the footer, making modal footer buttons unclickable. */
+.modal {
+  inset: 0;
+  position: fixed;
+  z-index: 1100;
+}
+
+/* Form inputs should stretch to full field width. The library's .field uses
+   align-items:flex-start, which shrinks .field-control to its content width
+   (only the Select stays full width via its own width:100%). */
+.field-control {
+  width: 100%;
+}
+
+/* Confirm (delete) modal — centered warning icon, title, message and actions */
+.confirm-modal {
+  padding: 8px 0 4px;
+  text-align: center;
+}
+
+.confirm-modal__icon {
+  align-items: center;
+  background: rgba(239, 68, 68, 0.12);
+  border-radius: 9999px;
+  color: var(--naytak-danger, #ef4444);
+  display: inline-flex;
+  height: 56px;
+  justify-content: center;
+  margin-bottom: 14px;
+  width: 56px;
+}
+
+.confirm-modal__title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin: 0 0 6px;
+}
+
+.confirm-modal__message {
+  color: var(--naytak-text-muted, #6b7280);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0 auto 22px;
+  max-width: 300px;
+}
+
+.confirm-modal__actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.confirm-modal__actions .btn {
+  flex: 1;
+  min-width: 120px;
 }

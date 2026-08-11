@@ -1,0 +1,33 @@
+/* Orders feature styles */
+
+.order-detail__title {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.order-detail__rows {
+  display: flex;
+  flex-direction: column;
+  margin-top: 12px;
+}
+
+.order-detail__row {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+}
+
+.order-detail__row + .order-detail__row {
+  border-top: 1px solid var(--naytak-border, #e5e7eb);
+}
+
+.order-detail__row span {
+  color: var(--naytak-text-muted, #6b7280);
+  font-size: 0.875rem;
+}
+
+.order-detail__row strong {
+  font-weight: 600;
+}

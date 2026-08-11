@@ -1,0 +1,78 @@
+/* CoreUI-inspired widget cards & traffic list */
+
+.widget-card .card-body {
+  align-items: flex-start;
+  display: flex;
+  gap: 14px;
+  width: 100%;
+}
+
+.widget-card__icon {
+  align-items: center;
+  border-radius: 0.5rem;
+  display: flex;
+  flex-shrink: 0;
+  height: 48px;
+  justify-content: center;
+  margin-top: 2px;
+  width: 48px;
+}
+
+.widget-card__body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.widget-card__label {
+  color: var(--naytak-text-muted, #6b7280);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.widget-card__value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 2px 0 4px;
+}
+
+.widget-card__trend {
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.widget-card__trend span {
+  color: var(--naytak-text-muted, #6b7280);
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+.traffic-item {
+  margin: 14px 0;
+}
+
+.traffic-item:first-child {
+  margin-top: 4px;
+}
+
+.traffic-item:last-child {
+  margin-bottom: 4px;
+}
+
+.traffic-item__head {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+
+.traffic-item__label {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.traffic-item__visits {
+  color: var(--naytak-text-muted, #6b7280);
+  font-size: 0.8125rem;
+}

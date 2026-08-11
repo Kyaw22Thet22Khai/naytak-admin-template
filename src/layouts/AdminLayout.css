@@ -1,0 +1,87 @@
+/* Profile dropdown trigger in the admin navbar */
+
+.profile-trigger {
+  align-items: center;
+  border-radius: 0.5rem;
+  display: flex;
+  gap: 8px;
+  padding: 4px 8px;
+  transition: background-color 0.15s ease;
+}
+
+.profile-trigger:hover {
+  background-color: var(--naytak-surface-2, rgba(0, 0, 0, 0.06));
+}
+
+.profile-trigger__name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.profile-trigger__chevron {
+  color: var(--naytak-text-muted, #6b7280);
+  display: inline-flex;
+}
+
+@media (max-width: 599px) {
+  .profile-trigger__name {
+    display: none;
+  }
+}
+
+/* Navbar — the title text is removed and the collapse hamburger is pinned to
+   the left while the other actions stay grouped on the right. */
+.navbar-title:empty {
+  display: none;
+}
+
+.navbar-actions {
+  flex: 1 1 auto;
+  justify-content: space-between;
+}
+
+/* Sidebar brand — logo image + app name flush at the very top of the sidebar.
+   The library collapse toggler is hidden (collapse is triggered from the
+   navbar hamburger), so nav items start right below the brand with no gap. */
+.sidebar {
+  position: relative;
+}
+
+.sidebar-brand {
+  gap: 10px;
+  min-height: 60px;
+  padding: 0.75rem 1rem;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+}
+
+.sidebar-content {
+  padding-top: 60px; /* leave room for the fixed brand bar */
+}
+
+.sidebar-toggler {
+  display: none;
+}
+
+.sidebar-brand__logo {
+  border-radius: 0.5rem;
+  display: block;
+  flex-shrink: 0;
+  height: 32px;
+  width: 32px;
+}
+
+.sidebar-collapsed .sidebar-brand {
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.sidebar-collapsed .sidebar-brand__name {
+  display: none;
+}
