@@ -9,11 +9,17 @@ import {
   IconEdit,
 } from "naytak-react-ui";
 import { formatDate, capitalize } from "../../../utils/format";
-import { ConfirmButton } from "../../../components/ConfirmButton";
+import { ConfirmButton } from "../../../components/confirmButton";
 
 const ROLE_COLORS = {
   admin: "danger",
   editor: "info",
+  viewer: "secondary",
+};
+
+const AVATAR_COLORS = {
+  admin: "danger",
+  editor: "primary",
   viewer: "secondary",
 };
 
@@ -41,7 +47,11 @@ export function UsersTable({ users, onEdit, onDelete }) {
             <tr key={user.id}>
               <td>
                 <Stack direction="row" spacing={8} align="center">
-                  <Avatar size="sm" text={user.name} />
+                  <Avatar
+                    size="sm"
+                    text={user.name}
+                    color={AVATAR_COLORS[user.role] ?? "secondary"}
+                  />
                   <div>
                     <div>{user.name}</div>
                     <div className="list-meta">{user.email}</div>

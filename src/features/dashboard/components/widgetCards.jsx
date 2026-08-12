@@ -39,14 +39,14 @@ const COLORS = {
 
 export function WidgetCards() {
   return (
-    <Grid container>
+    <Grid container fluid>
       {WIDGETS.map((widget) => {
         const Icon = ICONS[widget.icon];
         const color = COLORS[widget.color] ?? COLORS.primary;
         const up = widget.trend >= 0;
         return (
           <GridItem key={widget.id} xs={12} sm={6} lg={3} spacing={2}>
-            <Card className="widget-card h-100">
+            <Card className="widget-card card-lift h-100">
               <div
                 className="widget-card__icon"
                 style={{ backgroundColor: `${color}1a`, color }}>

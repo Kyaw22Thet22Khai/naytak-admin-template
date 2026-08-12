@@ -13,7 +13,16 @@
   flex-shrink: 0;
   height: 48px;
   justify-content: center;
+  transition: transform 0.18s ease;
   width: 48px;
+}
+
+.file-card:hover .file-card__icon {
+  transform: scale(1.05);
+}
+
+.file-card:hover .file-card__download {
+  color: var(--naytak-primary, #2563eb);
 }
 
 .file-card__name {

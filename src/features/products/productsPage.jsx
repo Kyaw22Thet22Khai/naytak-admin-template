@@ -25,9 +25,9 @@ import {
   useToast,
 } from "naytak-react-ui";
 import { useDocumentTitle } from "../../hooks/useDocumentTitle";
-import { PageHeader } from "../../components/PageHeader";
-import { ConfirmButton } from "../../components/ConfirmButton";
-import { ProductFormModal } from "./components/ProductFormModal";
+import { PageHeader } from "../../components/pageHeader";
+import { ConfirmButton } from "../../components/confirmButton";
+import { ProductFormModal } from "./components/productFormModal";
 import { formatCurrency } from "../../utils/format";
 import { CATEGORY_OPTIONS, PRODUCTS, STOCK_STATUS } from "./data/mock";
 import "./products.css";
@@ -43,6 +43,14 @@ const ICONS = {
   keyboard: IconKeyboard,
   battery: IconBattery,
   zap: IconZap,
+};
+
+// Per-category accent colors for the product icon tile.
+const CATEGORY_COLORS = {
+  Electronics: "#2563eb",
+  Audio: "#8b5cf6",
+  Accessories: "#0ea5e9",
+  Home: "#f59e0b",
 };
 
 export function ProductsPage() {
@@ -138,6 +146,7 @@ export function ProductsPage() {
           {filtered.map((product) => {
             const Icon = ICONS[product.icon] ?? IconPackage;
             const stock = STOCK_STATUS[product.status] ?? STOCK_STATUS.in_stock;
+            const color = CATEGORY_COLORS[product.category] ?? "#2563eb";
             return (
               <GridItem
                 key={product.id}
@@ -146,9 +155,11 @@ export function ProductsPage() {
                 lg={4}
                 spacing={2}
                 className="mb-2">
-                <Card className="h-100 product-card">
+                <Card className="h-100 product-card card-lift">
                   <Stack direction="row" spacing={14}>
-                    <div className="product-card__icon">
+                    <div
+                      className="product-card__icon"
+                      style={{ backgroundColor: `${color}1a`, color }}>
                       <Icon size={24} />
                     </div>
                     <div style={{ flex: "1 1 auto", minWidth: 0 }}>

@@ -7,33 +7,67 @@ import {
   EmptyState,
   Grid,
   GridItem,
+  IconEdit,
   IconFolder,
   IconPlus,
   Progress,
   SearchInput,
   Select,
   Stack,
+  useToast,
 } from "naytak-react-ui";
 import { useDocumentTitle } from "../../hooks/useDocumentTitle";
-import { PageHeader } from "../../components/PageHeader";
-import { formatDate } from "../../utils/format";
+import { PageHeader } from "../../components/pageHeader";
+import { ConfirmButton } from "../../components/confirmButton";
+import { ProjectFormModal } from "./components/projectFormModal";
+import { capitalize, formatDate } from "../../utils/format";
 import { PROJECTS, STATUS_COLORS, STATUS_OPTIONS } from "./data/mock";
 import "./projects.css";
 
 export function ProjectsPage() {
   useDocumentTitle("Projects");
+  const toast = useToast();
 
+  const [projects, setProjects] = useState(PROJECTS);
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("all");
+  const [formOpen, setFormOpen] = useState(false);
+  const [editingProject, setEditingProject] = useState(null);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return PROJECTS.filter((project) => {
+    return projects.filter((project) => {
       const matchesQuery = !q || project.name.toLowerCase().includes(q);
       const matchesStatus = status === "all" || project.status === status;
       return matchesQuery && matchesStatus;
     });
-  }, [query, status]);
+  }, [projects, query, status]);
+
+  const openForm = (project) => {
+    setEditingProject(project);
+    setFormOpen(true);
+  };
+
+  const handleSave = (data) => {
+    if (editingProject) {
+      setProjects((prev) =>
+        prev.map((project) =>
+          project.id === editingProject.id ? { ...project, ...data } : project,
+        ),
+      );
+      toast.success("Project updated");
+    } else {
+      setProjects((prev) => [{ ...data, id: Date.now() }, ...prev]);
+      toast.success("Project created");
+    }
+    setStatus("all");
+    setFormOpen(false);
+  };
+
+  const handleDelete = (id) => {
+    setProjects((prev) => prev.filter((project) => project.id !== id));
+    toast.success("Project deleted");
+  };
 
   return (
     <Grid container fluid>
@@ -42,7 +76,10 @@ export function ProjectsPage() {
           title="Projects"
           subtitle="Track progress across your team's work"
           actions={
-            <Button size="sm" leftIcon={<IconPlus size={16} />}>
+            <Button
+              size="sm"
+              leftIcon={<IconPlus size={16} />}
+              onClick={() => openForm(null)}>
               New project
             </Button>
           }
@@ -75,7 +112,7 @@ export function ProjectsPage() {
               lg={4}
               spacing={2}
               className="mb-2">
-              <Card className="h-100 project-card">
+              <Card className="h-100 project-card card-lift">
                 <div className="project-card__head">
                   <div className="project-card__icon">
                     <IconFolder size={22} />
@@ -92,7 +129,7 @@ export function ProjectsPage() {
                       className="mt-2">
                       <Badge
                         color={STATUS_COLORS[project.status] ?? "secondary"}>
-                        {project.status}
+                        {capitalize(project.status)}
                       </Badge>
                     </Stack>
                   </div>
@@ -106,7 +143,10 @@ export function ProjectsPage() {
                     <span>{project.progress}% complete</span>
                     <span>Due {formatDate(project.due)}</span>
                   </Stack>
-                  <Progress value={project.progress} />
+                  <Progress
+                    value={project.progress}
+                    color={STATUS_COLORS[project.status] ?? "primary"}
+                  />
                 </div>
 
                 <div className="project-card__team">
@@ -117,6 +157,26 @@ export function ProjectsPage() {
                     <Avatar size="sm" text={`+${project.team.length - 4}`} />
                   )}
                 </div>
+
+                <Stack
+                  direction="row"
+                  spacing={4}
+                  className="project-card__footer">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    leftIcon={<IconEdit size={16} />}
+                    onClick={() => openForm(project)}>
+                    Edit
+                  </Button>
+                  <ConfirmButton
+                    size="sm"
+                    label="Delete"
+                    title="Delete project?"
+                    message={`"${project.name}" will be removed from the list.`}
+                    onConfirm={() => handleDelete(project.id)}
+                  />
+                </Stack>
               </Card>
             </GridItem>
           ))}
@@ -130,6 +190,13 @@ export function ProjectsPage() {
           />
         </GridItem>
       )}
+
+      <ProjectFormModal
+        open={formOpen}
+        project={editingProject}
+        onClose={() => setFormOpen(false)}
+        onSave={handleSave}
+      />
     </Grid>
   );
 }

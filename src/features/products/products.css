@@ -10,9 +10,15 @@
   border-radius: 0.75rem;
   color: var(--naytak-primary, #2563eb);
   display: flex;
+  flex-shrink: 0;
   height: 56px;
   justify-content: center;
+  transition: transform 0.18s ease;
   width: 56px;
+}
+
+.product-card:hover .product-card__icon {
+  transform: scale(1.05);
 }
 
 .product-card__name {
@@ -42,4 +48,12 @@
   display: flex;
   gap: 8px;
   margin-top: 12px;
+}
+
+.product-card__footer .btn {
+  flex: 1;
+}
+
+.product-card__price {
+  color: var(--naytak-primary, #2563eb);
 }

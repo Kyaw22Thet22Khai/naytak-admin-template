@@ -18,8 +18,8 @@ import {
   TableHead,
 } from "naytak-react-ui";
 import { useDocumentTitle } from "../../hooks/useDocumentTitle";
-import { PageHeader } from "../../components/PageHeader";
-import { CustomerDetailModal } from "./components/CustomerDetailModal";
+import { PageHeader } from "../../components/pageHeader";
+import { CustomerDetailModal } from "./components/customerDetailModal";
 import { formatCurrency, formatDate } from "../../utils/format";
 import {
   CUSTOMERS,

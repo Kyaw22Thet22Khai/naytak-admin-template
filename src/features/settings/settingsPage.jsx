@@ -17,7 +17,7 @@ import {
   useToast,
 } from "naytak-react-ui";
 import { useDocumentTitle } from "../../hooks/useDocumentTitle";
-import { PageHeader } from "../../components/PageHeader";
+import { PageHeader } from "../../components/pageHeader";
 
 const TABS = [
   { label: "General", value: "general" },

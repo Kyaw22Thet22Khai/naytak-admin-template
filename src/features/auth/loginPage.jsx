@@ -9,20 +9,18 @@ import {
   useToast,
 } from "naytak-react-ui";
 import { useDocumentTitle } from "../../hooks/useDocumentTitle";
-import { AuthLayout } from "./AuthLayout";
+import { AuthLayout } from "./authLayout";
 import { ROUTES } from "../../app/routes";
 
-export function RegisterPage() {
-  useDocumentTitle("Create account");
+export function LoginPage() {
+  useDocumentTitle("Sign in");
   const navigate = useNavigate();
   const toast = useToast();
 
   const [form, setForm] = useState({
-    name: "",
     email: "",
     password: "",
-    confirm: "",
-    terms: false,
+    remember: false,
   });
 
   const setField = (field) => (e) =>
@@ -30,36 +28,26 @@ export function RegisterPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (form.password !== form.confirm) {
-      toast.error("Passwords do not match");
+    if (!form.password) {
+      toast.error("Please enter your password");
       return;
     }
-    if (!form.terms) {
-      toast.error("Please accept the Terms & Privacy Policy");
-      return;
-    }
-    toast.success("Account created. Please sign in.");
-    navigate(ROUTES.login);
+    toast.success("Signed in successfully");
+    navigate(ROUTES.dashboard);
   };
 
   return (
     <AuthLayout
-      title="Create account"
-      subtitle="Start managing your store in minutes"
+      title="Welcome back"
+      subtitle="Sign in to your account to continue"
       footer={
         <>
-          Already have an account? <Link to={ROUTES.login}>Sign in</Link>
+          Don&apos;t have an account?{" "}
+          <Link to={ROUTES.register}>Create one</Link>
         </>
       }>
       <form onSubmit={handleSubmit}>
         <Stack direction="column" spacing={14}>
-          <Input
-            label="Full name"
-            placeholder="Jane Doe"
-            value={form.name}
-            onChange={setField("name")}
-            required
-          />
           <Input
             label="Email"
             type="email"
@@ -70,27 +58,24 @@ export function RegisterPage() {
           />
           <PasswordInput
             label="Password"
+            placeholder="••••••••"
             value={form.password}
             onChange={(value) =>
               setForm((prev) => ({ ...prev, password: value }))
             }
           />
-          <PasswordInput
-            label="Confirm password"
-            value={form.confirm}
-            onChange={(value) =>
-              setForm((prev) => ({ ...prev, confirm: value }))
-            }
-          />
-          <Checkbox
-            label="I agree to the Terms & Privacy Policy"
-            checked={form.terms}
-            onChange={(e) =>
-              setForm((prev) => ({ ...prev, terms: e.target.checked }))
-            }
-          />
+          <Stack direction="row" justify="space-between" align="center">
+            <Checkbox
+              label="Remember me"
+              checked={form.remember}
+              onChange={(e) =>
+                setForm((prev) => ({ ...prev, remember: e.target.checked }))
+              }
+            />
+            <Link to="#">Forgot password?</Link>
+          </Stack>
           <Button type="submit" block>
-            Create account
+            Sign in
           </Button>
         </Stack>
       </form>

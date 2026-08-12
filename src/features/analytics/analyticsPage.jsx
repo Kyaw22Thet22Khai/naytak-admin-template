@@ -9,7 +9,7 @@ import {
   Stat,
 } from "naytak-react-ui";
 import { useDocumentTitle } from "../../hooks/useDocumentTitle";
-import { PageHeader } from "../../components/PageHeader";
+import { PageHeader } from "../../components/pageHeader";
 import {
   ANALYTICS_STATS,
   CONVERSION,
@@ -30,11 +30,11 @@ export function AnalyticsPage() {
         />
       </GridItem>
 
-      <GridItem xs={12} spacing={2} className="mb-2">
-        <Grid container>
+      <GridItem xs={12} className="mb-2">
+        <Grid container fluid>
           {ANALYTICS_STATS.map((stat) => (
             <GridItem key={stat.id} xs={12} sm={6} lg={3} spacing={2}>
-              <Card className="h-100">
+              <Card className="h-100 card-lift">
                 <Stat
                   label={stat.label}
                   value={stat.value}

@@ -9,6 +9,7 @@ import {
   GridItem,
   IconCheck,
   IconClipboardList,
+  IconEdit,
   IconPlus,
   Pagination,
   SearchInput,
@@ -20,7 +21,9 @@ import {
   useToast,
 } from "naytak-react-ui";
 import { useDocumentTitle } from "../../hooks/useDocumentTitle";
-import { PageHeader } from "../../components/PageHeader";
+import { PageHeader } from "../../components/pageHeader";
+import { ConfirmButton } from "../../components/confirmButton";
+import { TaskFormModal } from "./components/taskFormModal";
 import { capitalize, formatDate } from "../../utils/format";
 import {
   PRIORITY_COLORS,
@@ -42,6 +45,8 @@ export function TasksPage() {
   const [priority, setPriority] = useState("all");
   const [status, setStatus] = useState("all");
   const [page, setPage] = useState(1);
+  const [formOpen, setFormOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState(null);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -73,6 +78,34 @@ export function TasksPage() {
     );
   };
 
+  const openForm = (task) => {
+    setEditingTask(task);
+    setFormOpen(true);
+  };
+
+  const handleSave = (data) => {
+    if (editingTask) {
+      setTasks((prev) =>
+        prev.map((task) =>
+          task.id === editingTask.id ? { ...task, ...data } : task,
+        ),
+      );
+      toast.success("Task updated");
+    } else {
+      setTasks((prev) => [{ ...data, id: Date.now() }, ...prev]);
+      toast.success("Task created");
+    }
+    setPriority("all");
+    setStatus("all");
+    setPage(1);
+    setFormOpen(false);
+  };
+
+  const handleDelete = (id) => {
+    setTasks((prev) => prev.filter((task) => task.id !== id));
+    toast.success("Task deleted");
+  };
+
   return (
     <Grid container fluid>
       <GridItem xs={12} spacing={2} className="mb-3">
@@ -80,7 +113,10 @@ export function TasksPage() {
           title="Tasks"
           subtitle="Track and manage your team's work"
           actions={
-            <Button size="sm" leftIcon={<IconPlus size={16} />}>
+            <Button
+              size="sm"
+              leftIcon={<IconPlus size={16} />}
+              onClick={() => openForm(null)}>
               New task
             </Button>
           }
@@ -156,6 +192,13 @@ export function TasksPage() {
                           <Button
                             size="sm"
                             variant="ghost"
+                            leftIcon={<IconEdit size={16} />}
+                            onClick={() => openForm(task)}>
+                            Edit
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
                             leftIcon={<IconCheck size={16} />}
                             onClick={() => {
                               toggleDone(task.id);
@@ -167,6 +210,13 @@ export function TasksPage() {
                             }}>
                             {task.status === "done" ? "Reopen" : "Complete"}
                           </Button>
+                          <ConfirmButton
+                            size="sm"
+                            label="Delete"
+                            title="Delete task?"
+                            message={`"${task.title}" will be removed from the list.`}
+                            onConfirm={() => handleDelete(task.id)}
+                          />
                         </Stack>
                       </td>
                     </tr>
@@ -193,6 +243,13 @@ export function TasksPage() {
           )}
         </Card>
       </GridItem>
+
+      <TaskFormModal
+        open={formOpen}
+        task={editingTask}
+        onClose={() => setFormOpen(false)}
+        onSave={handleSave}
+      />
     </Grid>
   );
 }

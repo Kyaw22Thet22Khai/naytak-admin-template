@@ -15,7 +15,12 @@
   height: 48px;
   justify-content: center;
   margin-top: 2px;
+  transition: transform 0.18s ease;
   width: 48px;
+}
+
+.widget-card:hover .widget-card__icon {
+  transform: scale(1.06);
 }
 
 .widget-card__body {

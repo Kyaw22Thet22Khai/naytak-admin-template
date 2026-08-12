@@ -1,1 +1,1 @@
-export { MediaPage } from "./MediaPage";
+export { MediaPage } from "./mediaPage";

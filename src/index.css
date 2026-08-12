@@ -91,6 +91,29 @@ code {
   align-items: flex-end;
 }
 
+/* Keep search + filter controls on a single row: the search takes a fixed
+   width instead of stretching to fill the row, and the selects shrink to
+   their content so they sit beside it. They still wrap gracefully on narrow
+   screens because the toolbar Stack uses flex-wrap. */
+.list-toolbar .search-input {
+  flex: 0 1 300px;
+}
+
+.list-toolbar .field {
+  flex: 0 0 auto;
+}
+
+/* Make the search field and the filter Selects the exact same height (40px)
+   and vertically center their text so the toolbar row lines up on every list
+   page. Horizontal padding is untouched (the search needs room for its icon
+   and clear button). */
+.list-toolbar .search-input-field,
+.list-toolbar .select {
+  height: 40px;
+  padding-bottom: 0;
+  padding-top: 0;
+}
+
 .list-pagination {
   display: flex;
   justify-content: flex-end;
@@ -154,4 +177,72 @@ code {
 .confirm-modal__actions .btn {
   flex: 1;
   min-width: 120px;
+}
+
+/* ---------------------------------------------------------------------------
+   UI polish — theme-aware global refinements
+   --------------------------------------------------------------------------- */
+
+/* Theme-aware page background so light/dark switching feels seamless (no white
+   flash) and the base text color is consistent. */
+body {
+  background-color: var(--naytak-bg, #f6f8fb);
+  color: var(--naytak-text, #111827);
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+
+::selection {
+  background: var(--naytak-primary-soft, rgba(37, 99, 235, 0.2));
+}
+
+/* Slim, unobtrusive scrollbars */
+* {
+  scrollbar-color: var(--naytak-border-strong, #d1d5db) transparent;
+  scrollbar-width: thin;
+}
+
+/* Consistent keyboard-focus ring (kept low specificity so component styles
+   that already define a focus ring win). */
+:where(
+  a,
+  button,
+  [role="button"],
+  input,
+  select,
+  textarea,
+  [tabindex]
+):focus-visible {
+  outline: 2px solid var(--naytak-primary, #2563eb);
+  outline-offset: 2px;
+}
+
+/* Subtle hover highlight on table body rows (theme-aware). */
+.table tbody tr:hover {
+  background: var(--naytak-primary-soft, rgba(37, 99, 235, 0.08));
+}
+
+/* Card hover lift — apply alongside Card for a gentle raise + primary border
+   tint on interaction (used on widget/product/project/file cards). */
+.card-lift {
+  cursor: default;
+}
+
+.card-lift:hover {
+  border-color: color-mix(
+    in srgb,
+    var(--naytak-primary, #2563eb) 40%,
+    transparent
+  );
+  box-shadow: var(--naytak-shadow-lg, 0 16px 40px rgb(30 41 59 / 18%));
+  transform: translateY(-3px);
+}
+
+/* Detail rows inside the detail modals — emphasize the closing (total) value. */
+.order-detail__rows .order-detail__row:last-child strong,
+.invoice-detail__rows .invoice-detail__row:last-child strong,
+.customer-detail__rows .customer-detail__row:last-child strong {
+  color: var(--naytak-primary, #2563eb);
+  font-weight: 700;
 }

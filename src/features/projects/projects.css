@@ -19,7 +19,12 @@
   flex-shrink: 0;
   height: 44px;
   justify-content: center;
+  transition: transform 0.18s ease;
   width: 44px;
+}
+
+.project-card:hover .project-card__icon {
+  transform: scale(1.05);
 }
 
 .project-card__name {
@@ -45,6 +50,17 @@
   margin-top: 12px;
 }
 
+.project-card__team .avatar {
+  border: 2px solid var(--naytak-surface, #ffffff);
+  box-sizing: content-box;
+}
+
 .project-card__team .avatar + .avatar {
   margin-left: -8px;
+}
+
+.project-card__footer {
+  border-top: 1px solid var(--naytak-border, #e5e7eb);
+  margin-top: 12px;
+  padding-top: 10px;
 }

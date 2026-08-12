@@ -14,8 +14,9 @@ import {
   useToast,
 } from "naytak-react-ui";
 import { useDocumentTitle } from "../../hooks/useDocumentTitle";
-import { PageHeader } from "../../components/PageHeader";
+import { PageHeader } from "../../components/pageHeader";
 import { formatDate } from "../../utils/format";
+import { ComposeMessageModal } from "./components/composeMessageModal";
 import { FOLDER_OPTIONS, MESSAGES } from "./data/mock";
 import "./messages.css";
 
@@ -26,6 +27,7 @@ export function MessagesPage() {
   const [messages, setMessages] = useState(MESSAGES);
   const [query, setQuery] = useState("");
   const [folder, setFolder] = useState("all");
+  const [composeOpen, setComposeOpen] = useState(false);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -54,6 +56,24 @@ export function MessagesPage() {
     toast.success(message?.unread ? "Marked as read" : "Marked as unread");
   };
 
+  const handleSend = ({ to, subject, body }) => {
+    setMessages((prev) => [
+      {
+        id: Date.now(),
+        sender: to,
+        email: "",
+        subject,
+        snippet: body,
+        time: new Date().toISOString(),
+        unread: true,
+      },
+      ...prev,
+    ]);
+    setFolder("all");
+    setComposeOpen(false);
+    toast.success("Message sent");
+  };
+
   return (
     <Grid container fluid>
       <GridItem xs={12} spacing={2} className="mb-3">
@@ -64,7 +84,7 @@ export function MessagesPage() {
             <Button
               size="sm"
               leftIcon={<IconPen size={16} />}
-              onClick={() => toast.info("Compose coming soon")}>
+              onClick={() => setComposeOpen(true)}>
               Compose
             </Button>
           }
@@ -89,7 +109,13 @@ export function MessagesPage() {
 
           {filtered.length > 0 ? (
             filtered.map((message) => (
-              <div key={message.id} className="message-row">
+              <div
+                key={message.id}
+                className={
+                  message.unread
+                    ? "message-row message-row--unread"
+                    : "message-row"
+                }>
                 <span
                   className="message-row__indicator"
                   style={{ visibility: message.unread ? "visible" : "hidden" }}
@@ -139,6 +165,12 @@ export function MessagesPage() {
           )}
         </Card>
       </GridItem>
+
+      <ComposeMessageModal
+        open={composeOpen}
+        onClose={() => setComposeOpen(false)}
+        onSend={handleSend}
+      />
     </Grid>
   );
 }

@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   Avatar,
   Button,
   DashboardLayout,
   DropdownMenu,
+  Popover,
   SidebarItem,
   IconBell,
   IconChevronDown,
@@ -19,8 +21,11 @@ import {
 } from "naytak-react-ui";
 import { NAV_ITEMS, ROUTES } from "../app/routes";
 import { APP_NAME, CURRENT_USER } from "../constants/app";
+import { NOTIFICATIONS } from "../constants/notifications";
+import { NotificationPanel } from "../components/notificationPanel";
+import { NotificationsModal } from "../components/notificationsModal";
 import logo from "../assets/logo.svg";
-import "./AdminLayout.css";
+import "./adminLayout.css";
 
 /**
  * Admin shell rendered around every page.
@@ -32,6 +37,24 @@ export function AdminLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const toast = useToast();
+
+  // Notification bell state (navbar).
+  const [notifications, setNotifications] = useState(NOTIFICATIONS);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [viewAllOpen, setViewAllOpen] = useState(false);
+
+  const unreadCount = notifications.filter((n) => n.unread).length;
+
+  const markAllRead = () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })));
+    toast.success("All notifications marked as read");
+  };
+
+  const markRead = (id) => {
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, unread: false } : n)),
+    );
+  };
 
   // The sidebar's own collapse toggle is hidden (see AdminLayout.css); the
   // hamburger in the navbar drives it by triggering the library toggler so
@@ -107,12 +130,34 @@ export function AdminLayout() {
     <>
       {sidebarToggle}
       <Stack direction="row" spacing={8} align="center">
-        <Button
-          variant="ghost"
-          size="sm"
-          aria-label="Notifications"
-          leftIcon={<IconBell size={20} />}
-        />
+        <Popover
+          open={notifOpen}
+          onOpenChange={setNotifOpen}
+          position="bottom"
+          closeOnOutsideClick
+          content={
+            <NotificationPanel
+              notifications={notifications}
+              onMarkAllRead={markAllRead}
+              onRead={markRead}
+              onViewAll={() => {
+                setNotifOpen(false);
+                setViewAllOpen(true);
+              }}
+            />
+          }>
+          <span className="navbar-bell">
+            <Button
+              variant="ghost"
+              size="sm"
+              aria-label={`Notifications (${unreadCount} unread)`}
+              leftIcon={<IconBell size={20} />}
+            />
+            {unreadCount > 0 && (
+              <span className="navbar-bell__badge">{unreadCount}</span>
+            )}
+          </span>
+        </Popover>
         <Button
           variant="ghost"
           size="sm"
@@ -147,6 +192,14 @@ export function AdminLayout() {
       breadcrumbItems={breadcrumbItems}
       footer={`${APP_NAME} © ${new Date().getFullYear()}`}>
       <Outlet />
+
+      <NotificationsModal
+        open={viewAllOpen}
+        notifications={notifications}
+        onClose={() => setViewAllOpen(false)}
+        onRead={markRead}
+        onMarkAllRead={markAllRead}
+      />
     </DashboardLayout>
   );
 }

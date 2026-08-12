@@ -1,5 +1,5 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AdminLayout } from "../layouts/AdminLayout";
+import { HashRouter, Routes, Route } from "react-router-dom";
+import { AdminLayout } from "../layouts/adminLayout";
 import { DashboardPage } from "../features/dashboard";
 import { AnalyticsPage } from "../features/analytics";
 import { CustomersPage } from "../features/customers";
@@ -18,7 +18,7 @@ import { RegisterPage } from "../features/auth";
 
 export function AppRouter() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         {/* Auth pages render standalone (no sidebar/navbar). */}
         <Route path="login" element={<LoginPage />} />
@@ -41,6 +41,6 @@ export function AppRouter() {
           <Route path="settings" element={<SettingsPage />} />
         </Route>
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }

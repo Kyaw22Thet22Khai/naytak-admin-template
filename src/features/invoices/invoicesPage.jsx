@@ -6,9 +6,10 @@ import {
   EmptyState,
   Grid,
   GridItem,
+  IconDownload,
   IconEye,
+  IconFileText,
   IconPlus,
-  IconShoppingCart,
   Pagination,
   SearchInput,
   Select,
@@ -16,38 +17,40 @@ import {
   Table,
   TableBody,
   TableHead,
+  useToast,
 } from "naytak-react-ui";
 import { useDocumentTitle } from "../../hooks/useDocumentTitle";
-import { PageHeader } from "../../components/PageHeader";
-import { OrderDetailModal } from "./components/OrderDetailModal";
+import { PageHeader } from "../../components/pageHeader";
+import { InvoiceDetailModal } from "./components/invoiceDetailModal";
 import { formatCurrency, formatDate, capitalize } from "../../utils/format";
-import { ORDERS, STATUS_COLORS, STATUS_OPTIONS } from "./data/mock";
+import { INVOICES, STATUS_COLORS, STATUS_OPTIONS } from "./data/mock";
 
 const PAGE_SIZE = 8;
 
-export function OrdersPage() {
-  useDocumentTitle("Orders");
+export function InvoicesPage() {
+  useDocumentTitle("Invoices");
+  const toast = useToast();
 
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("all");
   const [page, setPage] = useState(1);
-  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [selectedInvoice, setSelectedInvoice] = useState(null);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return ORDERS.filter((order) => {
+    return INVOICES.filter((invoice) => {
       const matchesQuery =
         !q ||
-        order.id.toLowerCase().includes(q) ||
-        order.customer.toLowerCase().includes(q);
-      const matchesStatus = status === "all" || order.status === status;
+        invoice.id.toLowerCase().includes(q) ||
+        invoice.customer.toLowerCase().includes(q);
+      const matchesStatus = status === "all" || invoice.status === status;
       return matchesQuery && matchesStatus;
     });
   }, [query, status]);
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(page, pageCount);
-  const visibleOrders = filtered.slice(
+  const visibleInvoices = filtered.slice(
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE,
   );
@@ -56,11 +59,11 @@ export function OrdersPage() {
     <Grid container fluid>
       <GridItem xs={12} spacing={2} className="mb-3">
         <PageHeader
-          title="Orders"
-          subtitle="Track and manage customer orders"
+          title="Invoices"
+          subtitle="Track issued invoices and payment status"
           actions={
             <Button size="sm" leftIcon={<IconPlus size={16} />}>
-              New order
+              New invoice
             </Button>
           }
         />
@@ -68,11 +71,11 @@ export function OrdersPage() {
 
       <GridItem xs={12} spacing={2}>
         <Card
-          title="All orders"
-          subtitle={`${filtered.length} order${filtered.length === 1 ? "" : "s"}`}>
+          title="All invoices"
+          subtitle={`${filtered.length} invoice${filtered.length === 1 ? "" : "s"}`}>
           <Stack direction="row" spacing={8} wrap className="mb-3 list-toolbar">
             <SearchInput
-              placeholder="Search order ID or customer…"
+              placeholder="Search invoice ID or customer…"
               clearable
               value={query}
               onChange={setQuery}
@@ -87,35 +90,32 @@ export function OrdersPage() {
             />
           </Stack>
 
-          {visibleOrders.length > 0 ? (
+          {visibleInvoices.length > 0 ? (
             <div className="table-scroll">
               <Table>
                 <TableHead color="primary">
                   <tr>
-                    <th>Order</th>
+                    <th>Invoice</th>
                     <th>Customer</th>
-                    <th>Date</th>
-                    <th>Items</th>
-                    <th>Total</th>
+                    <th>Issued</th>
+                    <th>Due</th>
+                    <th>Amount</th>
                     <th>Status</th>
                     <th style={{ textAlign: "right" }}>Actions</th>
                   </tr>
                 </TableHead>
                 <TableBody>
-                  {visibleOrders.map((order) => (
-                    <tr key={order.id}>
-                      <td>{order.id}</td>
-                      <td>
-                        <div>{order.customer}</div>
-                        <div className="list-meta">{order.email}</div>
-                      </td>
-                      <td>{formatDate(order.date)}</td>
-                      <td>{order.items}</td>
-                      <td>{formatCurrency(order.total)}</td>
+                  {visibleInvoices.map((invoice) => (
+                    <tr key={invoice.id}>
+                      <td>{invoice.id}</td>
+                      <td>{invoice.customer}</td>
+                      <td>{formatDate(invoice.issued)}</td>
+                      <td>{formatDate(invoice.due)}</td>
+                      <td>{formatCurrency(invoice.amount)}</td>
                       <td>
                         <Badge
-                          color={STATUS_COLORS[order.status] ?? "secondary"}>
-                          {capitalize(order.status)}
+                          color={STATUS_COLORS[invoice.status] ?? "secondary"}>
+                          {capitalize(invoice.status)}
                         </Badge>
                       </td>
                       <td>
@@ -123,9 +123,18 @@ export function OrdersPage() {
                           <Button
                             size="sm"
                             variant="ghost"
+                            leftIcon={<IconDownload size={16} />}
+                            onClick={() =>
+                              toast.info("Invoice PDF coming soon")
+                            }>
+                            PDF
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
                             leftIcon={<IconEye size={16} />}
-                            onClick={() => setSelectedOrder(order)}>
-                            Details
+                            onClick={() => setSelectedInvoice(invoice)}>
+                            View
                           </Button>
                         </Stack>
                       </td>
@@ -136,8 +145,8 @@ export function OrdersPage() {
             </div>
           ) : (
             <EmptyState
-              icon={<IconShoppingCart size={28} />}
-              title="No orders found"
+              icon={<IconFileText size={28} />}
+              title="No invoices found"
               description="Try a different search term or status filter."
             />
           )}
@@ -154,10 +163,10 @@ export function OrdersPage() {
         </Card>
       </GridItem>
 
-      {selectedOrder && (
-        <OrderDetailModal
-          order={selectedOrder}
-          onClose={() => setSelectedOrder(null)}
+      {selectedInvoice && (
+        <InvoiceDetailModal
+          invoice={selectedInvoice}
+          onClose={() => setSelectedInvoice(null)}
         />
       )}
     </Grid>

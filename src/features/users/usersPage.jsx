@@ -14,9 +14,9 @@ import {
   useToast,
 } from "naytak-react-ui";
 import { useDocumentTitle } from "../../hooks/useDocumentTitle";
-import { PageHeader } from "../../components/PageHeader";
-import { UsersTable } from "./components/UsersTable";
-import { AddUserModal } from "./components/AddUserModal";
+import { PageHeader } from "../../components/pageHeader";
+import { UsersTable } from "./components/usersTable";
+import { AddUserModal } from "./components/addUserModal";
 import { ROLE_OPTIONS, USERS } from "./data/mock";
 import "./users.css";
 

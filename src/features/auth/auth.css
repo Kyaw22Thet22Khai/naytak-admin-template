@@ -2,7 +2,18 @@
 
 .auth {
   align-items: center;
-  background: var(--naytak-surface-2, #f1f5f9);
+  background:
+    radial-gradient(
+      900px 480px at 12% -8%,
+      var(--naytak-primary-soft, rgba(37, 99, 235, 0.16)) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      800px 480px at 105% 110%,
+      var(--naytak-primary-soft, rgba(37, 99, 235, 0.12)) 0%,
+      transparent 55%
+    ),
+    var(--naytak-bg, #f1f5f9);
   display: flex;
   justify-content: center;
   min-height: 100vh;
@@ -10,8 +21,10 @@
 }
 
 .auth-card {
-  width: 100%;
+  border-radius: 1rem;
+  box-shadow: var(--naytak-shadow-lg, 0 16px 40px rgb(30 41 59 / 18%));
   max-width: 400px;
+  width: 100%;
 }
 
 .auth-card__brand {
@@ -25,6 +38,7 @@
 .auth-card__logo {
   align-items: center;
   border-radius: 0.6rem;
+  box-shadow: 0 6px 18px -6px var(--naytak-primary, #2563eb);
   display: flex;
   height: 38px;
   justify-content: center;
@@ -69,4 +83,10 @@
   color: var(--naytak-primary, #2563eb);
   font-weight: 600;
   text-decoration: none;
+  transition: text-decoration-color 0.15s ease;
+}
+
+.auth-card__footer a:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }

@@ -19,7 +19,7 @@ import {
   useToast,
 } from "naytak-react-ui";
 import { useDocumentTitle } from "../../hooks/useDocumentTitle";
-import { PageHeader } from "../../components/PageHeader";
+import { PageHeader } from "../../components/pageHeader";
 import { formatDate } from "../../utils/format";
 import { FILES, TYPE_OPTIONS } from "./data/mock";
 import "./media.css";
@@ -31,6 +31,16 @@ const ICONS = {
   sheet: IconFileSpreadsheet,
   archive: IconFileArchive,
   doc: IconFileText,
+};
+
+// Per-type accent colors for the file icon tile.
+const TYPE_COLORS = {
+  pdf: "#ef4444",
+  image: "#0ea5e9",
+  video: "#8b5cf6",
+  sheet: "#22c55e",
+  archive: "#f59e0b",
+  doc: "#2563eb",
 };
 
 export function MediaPage() {
@@ -103,9 +113,14 @@ export function MediaPage() {
                 lg={3}
                 spacing={2}
                 className="mb-2">
-                <Card className="h-100 file-card">
+                <Card className="h-100 file-card card-lift">
                   <Stack direction="row" spacing={12} align="center">
-                    <div className="file-card__icon">
+                    <div
+                      className="file-card__icon"
+                      style={{
+                        backgroundColor: `${TYPE_COLORS[file.icon] ?? "#2563eb"}1a`,
+                        color: TYPE_COLORS[file.icon] ?? "#2563eb",
+                      }}>
                       <Icon size={22} />
                     </div>
                     <div style={{ flex: "1 1 auto", minWidth: 0 }}>
@@ -117,6 +132,7 @@ export function MediaPage() {
                     <Button
                       size="sm"
                       variant="ghost"
+                      className="file-card__download"
                       aria-label={`Download ${file.name}`}
                       leftIcon={<IconDownload size={16} />}
                       onClick={() => toast.success(`Downloading ${file.name}`)}

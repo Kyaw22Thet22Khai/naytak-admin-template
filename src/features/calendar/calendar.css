@@ -2,23 +2,26 @@
 
 .calendar-event {
   border-bottom: 1px solid var(--naytak-border, #e5e7eb);
+  border-left: 3px solid var(--event-accent, var(--naytak-primary, #2563eb));
+  border-radius: 0.5rem;
   display: flex;
   gap: 14px;
-  padding: 12px 0;
+  padding: 12px 12px 12px 10px;
+  transition: background-color 0.15s ease;
 }
 
-.calendar-event:first-of-type {
-  padding-top: 4px;
+.calendar-event:hover {
+  background: var(--naytak-surface-2, rgba(0, 0, 0, 0.04));
 }
 
 .calendar-event:last-of-type {
   border-bottom: none;
-  padding-bottom: 4px;
 }
 
 .calendar-event__date {
-  background: var(--naytak-surface-2, rgba(0, 0, 0, 0.05));
+  background: color-mix(in srgb, var(--event-accent, #2563eb) 14%, transparent);
   border-radius: 0.5rem;
+  color: var(--event-accent, #2563eb);
   flex-shrink: 0;
   padding: 6px 0;
   text-align: center;
@@ -32,9 +35,9 @@
 }
 
 .calendar-event__month {
-  color: var(--naytak-text-muted, #6b7280);
   font-size: 0.6875rem;
   letter-spacing: 0.04em;
+  opacity: 0.78;
   text-transform: uppercase;
 }
 
@@ -53,6 +56,14 @@
   color: var(--naytak-text-muted, #6b7280);
   font-size: 0.8125rem;
   margin-top: 2px;
+}
+
+.calendar-event__actions {
+  align-items: center;
+  display: flex;
+  flex-shrink: 0;
+  gap: 4px;
+  margin-left: auto;
 }
 
 .calendar-week {
