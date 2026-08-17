@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, useHref, useLocation, useNavigate } from "react-router-dom";
 import {
   Avatar,
   Button,
@@ -46,6 +46,9 @@ export function AdminLayout() {
 
   // Current page — used for the breadcrumb and as the title of downloaded files.
   const currentItem = NAV_ITEMS.find((item) => location.pathname === item.path);
+
+  // Basename-aware href for the breadcrumb "Home" link (BrowserRouter).
+  const homeHref = useHref("/");
 
   // Notification bell state (navbar).
   const [notifications, setNotifications] = useState(NOTIFICATIONS);
@@ -248,7 +251,7 @@ export function AdminLayout() {
   );
 
   const breadcrumbItems = [
-    { label: "Home", href: ROUTES.dashboard },
+    { label: "Home", href: homeHref },
     ...(currentItem ? [{ label: currentItem.label }] : []),
   ];
 

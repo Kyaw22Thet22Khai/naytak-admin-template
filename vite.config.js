@@ -1,6 +1,7 @@
 import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import { projectZipPlugin } from "./plugins/projectZipPlugin";
+import { ghPagesSpaFallback } from "./plugins/ghPagesSpaFallback";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -9,7 +10,9 @@ export default defineConfig({
   base: "./",
   // Generates public/project-source.zip (whole project, no node_modules)
   // so the navbar Download button can offer the runnable project source.
-  plugins: [react(), projectZipPlugin()],
+  // ghPagesSpaFallback writes dist/404.html so BrowserRouter deep links
+  // (e.g. /customers) work on GitHub Pages without a "#".
+  plugins: [react(), projectZipPlugin(), ghPagesSpaFallback()],
   server: {
     // Bind to IPv4 explicitly. Vite's default "localhost" resolves to the
     // IPv6 loopback (::1), which fails with EACCES on some Windows setups.
