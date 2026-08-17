@@ -1,0 +1,43 @@
+# Auto-deploy to GitHub Pages on every push to `master`.
+#
+# The live site is served from the `gh-pages` branch. This workflow builds
+# the app and pushes `dist/` to that branch, so you no longer need to run
+# `npm run deploy` manually — a plain `git push` is enough.
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [master]
+  # Allow running from the Actions tab too.
+  workflow_dispatch:
+
+# Needed so the workflow can push the built app to the gh-pages branch.
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          # Replace the previous build instead of merging on top of it.
+          force_orphan: false
