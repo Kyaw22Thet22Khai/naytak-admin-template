@@ -12,6 +12,7 @@ import {
   IconImage,
   IconUsers,
   IconSettings,
+  IconComponent,
 } from "naytak-react-ui";
 
 /**
@@ -34,6 +35,7 @@ export const ROUTES = {
   media: "/media",
   users: "/users",
   settings: "/settings",
+  components: "/components",
 };
 
 /**
@@ -117,6 +119,12 @@ export const NAV_ITEMS = [
     label: "Users",
     path: ROUTES.users,
     icon: IconUsers,
+  },
+  {
+    key: "components",
+    label: "Components",
+    path: ROUTES.components,
+    icon: IconComponent,
   },
   {
     key: "settings",

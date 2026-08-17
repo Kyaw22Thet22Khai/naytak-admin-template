@@ -20,6 +20,12 @@
   padding: 24px;
 }
 
+@media (max-width: 599px) {
+  .auth {
+    padding: 16px;
+  }
+}
+
 .auth-card {
   border-radius: 1rem;
   box-shadow: var(--naytak-shadow-lg, 0 16px 40px rgb(30 41 59 / 18%));

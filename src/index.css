@@ -30,12 +30,98 @@ code {
   opacity: 0.7;
 }
 
-/* PageLoader shared styles */
-.page-loader {
-  display: flex;
+/* ---------------------------------------------------------------------------
+   Naytak branded loader — spinning ring around the logo + bouncing dots.
+   Used for page transitions and lazy routes.
+   --------------------------------------------------------------------------- */
+.naytak-loader {
   align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
   justify-content: center;
   min-height: 320px;
+}
+
+.naytak-loader__orbit {
+  display: grid;
+  height: 72px;
+  place-items: center;
+  position: relative;
+  width: 72px;
+}
+
+.naytak-loader__ring {
+  animation: naytak-spin 0.9s linear infinite;
+  border-radius: 50%;
+  border: 3px solid var(--naytak-border-strong, #d1d5db);
+  border-top-color: var(--naytak-primary, #2563eb);
+  inset: 0;
+  position: absolute;
+}
+
+.naytak-loader__logo {
+  border-radius: 14px;
+  box-shadow: 0 10px 24px -8px var(--naytak-primary, #2563eb);
+  height: 46px;
+  width: 46px;
+}
+
+.naytak-loader__label {
+  color: var(--naytak-text-muted, #6b7280);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.naytak-loader__dots {
+  display: inline-flex;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.naytak-loader__dots span {
+  animation: naytak-bounce 1.2s ease-in-out infinite;
+  background: var(--naytak-primary, #2563eb);
+  border-radius: 9999px;
+  height: 5px;
+  margin: 0 2px;
+  opacity: 0.35;
+  width: 5px;
+}
+
+.naytak-loader__dots span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.naytak-loader__dots span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes naytak-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes naytak-bounce {
+  0%,
+  60%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .naytak-loader__ring,
+  .naytak-loader__dots span {
+    animation: none;
+  }
 }
 
 /* Margin-bottom utilities (Bootstrap-style scale) */
@@ -245,4 +331,34 @@ body {
 .customer-detail__rows .customer-detail__row:last-child strong {
   color: var(--naytak-primary, #2563eb);
   font-weight: 700;
+}
+
+/* ---------------------------------------------------------------------------
+   Mobile refinements (≤599px) for shared list-page helpers and PageHeader
+   --------------------------------------------------------------------------- */
+@media (max-width: 599px) {
+  /* Stack the page title and its action buttons vertically on phones. */
+  .page-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* Let the search field take a full row on its own; filters wrap below. */
+  .list-toolbar .search-input {
+    flex: 1 1 100%;
+  }
+
+  /* Center and wrap pagination controls on small screens. */
+  .list-pagination {
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+  }
+
+  /* Slightly tighter table cells on phones (kept inside .table-scroll). */
+  .table th,
+  .table td {
+    padding: 0.6rem 0.75rem;
+  }
 }

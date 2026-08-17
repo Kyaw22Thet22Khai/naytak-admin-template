@@ -1,0 +1,67 @@
+/* Components showcase styles */
+
+.components-muted {
+  color: var(--naytak-text-muted, #6b7280);
+  font-size: 0.875rem;
+}
+
+.components-label {
+  color: var(--naytak-text-muted, #6b7280);
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+/* Circular progress — center the % label over the ring. */
+.components-circular {
+  align-items: center;
+  display: inline-flex;
+  justify-content: center;
+  position: relative;
+}
+
+.components-circular__label {
+  color: var(--naytak-text, #111827);
+  font-size: 0.875rem;
+  font-weight: 700;
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Table pagination inside the showcase card. */
+.components-pagination {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 12px;
+}
+
+.components-pagination .table-pagination {
+  flex-wrap: wrap;
+}
+
+/* Box demo. */
+.components-box {
+  background: var(--naytak-surface-2, rgba(0, 0, 0, 0.04));
+  border: 1px dashed var(--naytak-border-strong, #d1d5db);
+  border-radius: 0.5rem;
+  color: var(--naytak-text-muted, #6b7280);
+  font-size: 0.875rem;
+  padding: 16px;
+}
+
+/* Popover demo content. */
+.components-popover {
+  color: var(--naytak-text, #111827);
+  font-size: 0.875rem;
+  min-width: 160px;
+}
+
+@media (max-width: 599px) {
+  .components-pagination {
+    justify-content: center;
+  }
+}

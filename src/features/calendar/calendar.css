@@ -87,3 +87,31 @@
   font-weight: 600;
   width: 40px;
 }
+
+/* On phones, stack each event as a consistent card: date block on top, then
+   the body full-width, then the Edit/Delete actions on their own right-aligned
+   row. The meta row is allowed to wrap so a long "time + location" pair can
+   never force the body wider than the card (which previously made some events
+   squeeze beside the date and others wrap below it). */
+@media (max-width: 599px) {
+  .calendar-event {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .calendar-event__body {
+    flex: 1 1 100%;
+  }
+
+  .calendar-event__meta {
+    flex-wrap: wrap;
+    gap: 8px 16px;
+  }
+
+  .calendar-event__actions {
+    justify-content: flex-end;
+    margin-left: 0;
+    padding-top: 6px;
+    width: 100%;
+  }
+}

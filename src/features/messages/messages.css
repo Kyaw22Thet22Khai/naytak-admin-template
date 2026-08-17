@@ -77,3 +77,24 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* On phones, keep the unread dot + avatar + message body together on the top
+   row and drop the action button onto its own right-aligned line underneath.
+   This avoids the button squeezing the sender/subject and removes the awkward
+   empty gap that appeared when the button floated alone on the top row. */
+@media (max-width: 599px) {
+  .message-row {
+    flex-wrap: wrap;
+  }
+
+  .message-row__body {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .message-row > .btn {
+    margin-left: auto;
+    margin-top: 4px;
+    order: 3;
+  }
+}
