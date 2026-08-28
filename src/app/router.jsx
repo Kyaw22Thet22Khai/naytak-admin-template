@@ -15,6 +15,7 @@ import { MessagesPage } from "../features/messages";
 import { TasksPage } from "../features/tasks";
 import { ProjectsPage } from "../features/projects";
 import { MediaPage } from "../features/media";
+import { LandingPage } from "../features/landing";
 import { LoginPage } from "../features/auth";
 import { RegisterPage } from "../features/auth";
 
@@ -41,13 +42,17 @@ export function AppRouter() {
     <BrowserRouter basename={ROUTER_BASENAME}>
       <Suspense fallback={<NaytakLoader />}>
         <Routes>
+          {/* Landing page renders standalone (no sidebar/navbar) — it is the
+              entry point before the admin shell. */}
+          <Route index element={<LandingPage />} />
+
           {/* Auth pages render standalone (no sidebar/navbar). */}
           <Route path="login" element={<LoginPage />} />
           <Route path="register" element={<RegisterPage />} />
 
           {/* AdminLayout renders the sidebar/navbar shell; pages render via <Outlet /> */}
           <Route element={<AdminLayout />}>
-            <Route index element={<DashboardPage />} />
+            <Route path="dashboard" element={<DashboardPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />
             <Route path="customers" element={<CustomersPage />} />
             <Route path="orders" element={<OrdersPage />} />

@@ -1,18 +1,4 @@
-/* Page content fades in gently after a route transition loader. */
-.page-transition-content {
-  animation: page-fade-in 0.25s ease;
-}
-
-@keyframes page-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+/* Page transition is static (no fade-in animation). */
 
 /* Download dropdown trigger in the admin navbar */
 .download-btn__label {
@@ -197,7 +183,6 @@
   display: flex;
   gap: 8px;
   padding: 4px 8px;
-  transition: background-color 0.15s ease;
 }
 
 .profile-trigger:hover {

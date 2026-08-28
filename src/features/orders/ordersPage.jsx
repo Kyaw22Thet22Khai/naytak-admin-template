@@ -16,6 +16,7 @@ import {
   Table,
   TableBody,
   TableHead,
+  useToast,
 } from "naytak-react-ui";
 import { useDocumentTitle } from "../../hooks/useDocumentTitle";
 import { PageHeader } from "../../components/pageHeader";
@@ -27,6 +28,7 @@ const PAGE_SIZE = 8;
 
 export function OrdersPage() {
   useDocumentTitle("Orders");
+  const toast = useToast();
 
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("all");
@@ -59,7 +61,10 @@ export function OrdersPage() {
           title="Orders"
           subtitle="Track and manage customer orders"
           actions={
-            <Button size="sm" leftIcon={<IconPlus size={16} />}>
+            <Button
+              size="sm"
+              leftIcon={<IconPlus size={16} />}
+              onClick={() => toast.info("New order form coming soon")}>
               New order
             </Button>
           }

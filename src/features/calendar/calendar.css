@@ -7,11 +7,6 @@
   display: flex;
   gap: 14px;
   padding: 12px 12px 12px 10px;
-  transition: background-color 0.15s ease;
-}
-
-.calendar-event:hover {
-  background: var(--naytak-surface-2, rgba(0, 0, 0, 0.04));
 }
 
 .calendar-event:last-of-type {

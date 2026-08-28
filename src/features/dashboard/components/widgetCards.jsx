@@ -28,10 +28,10 @@ const FORMATTERS = {
   percent: formatPercent,
 };
 
-// CoreUI-inspired palette (falls back to primary)
-const COLORS = {
+// Professional muted palette (slate / blue / green family)
+const PALETTE = {
   primary: "#2563eb",
-  success: "#22c55e",
+  success: "#10b981",
   warning: "#f59e0b",
   info: "#0ea5e9",
   danger: "#ef4444",
@@ -42,11 +42,13 @@ export function WidgetCards() {
     <Grid container fluid>
       {WIDGETS.map((widget) => {
         const Icon = ICONS[widget.icon];
-        const color = COLORS[widget.color] ?? COLORS.primary;
+        const color = PALETTE[widget.color] ?? PALETTE.primary;
         const up = widget.trend >= 0;
         return (
           <GridItem key={widget.id} xs={12} sm={6} lg={3} spacing={2}>
-            <Card className="widget-card card-lift h-100">
+            <Card
+              className="widget-card h-100"
+              style={{ "--widget-accent": color }}>
               <div
                 className="widget-card__icon"
                 style={{ backgroundColor: `${color}1a`, color }}>
@@ -59,7 +61,7 @@ export function WidgetCards() {
                 </div>
                 <div
                   className="widget-card__trend"
-                  style={{ color: up ? COLORS.success : COLORS.danger }}>
+                  style={{ color: up ? PALETTE.success : PALETTE.danger }}>
                   {up ? "▲" : "▼"} {Math.abs(widget.trend)}%
                   <span>{widget.note}</span>
                 </div>

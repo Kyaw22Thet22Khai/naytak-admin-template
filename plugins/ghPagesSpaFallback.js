@@ -21,7 +21,10 @@ export function ghPagesSpaFallback() {
     closeBundle() {
       try {
         const buildDir = resolve(root, outDir);
-        copyFileSync(resolve(buildDir, "index.html"), resolve(buildDir, "404.html"));
+        copyFileSync(
+          resolve(buildDir, "index.html"),
+          resolve(buildDir, "404.html"),
+        );
       } catch (error) {
         console.warn("[ghPagesSpaFallback] failed to write 404.html:", error);
       }

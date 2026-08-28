@@ -13,12 +13,7 @@
   flex-shrink: 0;
   height: 56px;
   justify-content: center;
-  transition: transform 0.18s ease;
   width: 56px;
-}
-
-.product-card:hover .product-card__icon {
-  transform: scale(1.05);
 }
 
 .product-card__name {
@@ -34,6 +29,7 @@
 }
 
 .product-card__price {
+  color: var(--naytak-primary, #2563eb);
   font-size: 1.125rem;
   font-weight: 700;
   margin: 8px 0 2px;
@@ -52,8 +48,4 @@
 
 .product-card__footer .btn {
   flex: 1;
-}
-
-.product-card__price {
-  color: var(--naytak-primary, #2563eb);
 }

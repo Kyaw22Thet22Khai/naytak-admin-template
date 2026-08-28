@@ -19,12 +19,7 @@
   flex-shrink: 0;
   height: 44px;
   justify-content: center;
-  transition: transform 0.18s ease;
   width: 44px;
-}
-
-.project-card:hover .project-card__icon {
-  transform: scale(1.05);
 }
 
 .project-card__name {

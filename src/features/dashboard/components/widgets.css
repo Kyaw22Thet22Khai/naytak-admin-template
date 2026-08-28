@@ -1,58 +1,7 @@
-/* CoreUI-inspired widget cards & traffic list */
+/* Dashboard traffic sources list. The shared `.widget-card` stat styles now
+   live in src/index.css (used by both the Dashboard and Analytics pages). */
 
-.widget-card .card-body {
-  align-items: flex-start;
-  display: flex;
-  gap: 14px;
-  width: 100%;
-}
-
-.widget-card__icon {
-  align-items: center;
-  border-radius: 0.5rem;
-  display: flex;
-  flex-shrink: 0;
-  height: 48px;
-  justify-content: center;
-  margin-top: 2px;
-  transition: transform 0.18s ease;
-  width: 48px;
-}
-
-.widget-card:hover .widget-card__icon {
-  transform: scale(1.06);
-}
-
-.widget-card__body {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.widget-card__label {
-  color: var(--naytak-text-muted, #6b7280);
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.widget-card__value {
-  font-size: 1.5rem;
-  font-weight: 700;
-  line-height: 1.25;
-  margin: 2px 0 4px;
-}
-
-.widget-card__trend {
-  font-size: 0.8125rem;
-  font-weight: 600;
-}
-
-.widget-card__trend span {
-  color: var(--naytak-text-muted, #6b7280);
-  font-weight: 400;
-  margin-left: 4px;
-}
+/* ---- Traffic sources -------------------------------------------------------- */
 
 .traffic-item {
   margin: 14px 0;
@@ -74,7 +23,7 @@
 
 .traffic-item__label {
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .traffic-item__visits {

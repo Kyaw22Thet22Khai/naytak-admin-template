@@ -62,7 +62,10 @@ export function InvoicesPage() {
           title="Invoices"
           subtitle="Track issued invoices and payment status"
           actions={
-            <Button size="sm" leftIcon={<IconPlus size={16} />}>
+            <Button
+              size="sm"
+              leftIcon={<IconPlus size={16} />}
+              onClick={() => toast.info("New invoice form coming soon")}>
               New invoice
             </Button>
           }

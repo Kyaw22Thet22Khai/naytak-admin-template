@@ -92,7 +92,9 @@ export function MessagesPage() {
       </GridItem>
 
       <GridItem xs={12} spacing={2}>
-        <Card title="Inbox" subtitle={`${filtered.length} message(s)`}>
+        <Card
+          title="Inbox"
+          subtitle={`${filtered.length} message${filtered.length === 1 ? "" : "s"}`}>
           <Stack direction="row" spacing={8} wrap className="mb-3 list-toolbar">
             <SearchInput
               placeholder="Search sender or subject…"

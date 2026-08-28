@@ -16,6 +16,7 @@ import {
   Table,
   TableBody,
   TableHead,
+  useToast,
 } from "naytak-react-ui";
 import { useDocumentTitle } from "../../hooks/useDocumentTitle";
 import { PageHeader } from "../../components/pageHeader";
@@ -35,6 +36,7 @@ const PAGE_SIZE = 8;
 
 export function CustomersPage() {
   useDocumentTitle("Customers");
+  const toast = useToast();
 
   const [query, setQuery] = useState("");
   const [segment, setSegment] = useState("all");
@@ -69,7 +71,10 @@ export function CustomersPage() {
           title="Customers"
           subtitle="Manage your customer base and segments"
           actions={
-            <Button size="sm" leftIcon={<IconEye size={16} />}>
+            <Button
+              size="sm"
+              leftIcon={<IconEye size={16} />}
+              onClick={() => toast.success("Export coming soon")}>
               Export
             </Button>
           }

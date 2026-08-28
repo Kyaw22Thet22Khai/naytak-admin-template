@@ -1,0 +1,574 @@
+/* ===========================================================================
+   Landing page — public entry point shown before the admin shell.
+   Uses the naytak-react-ui design tokens (--naytak-*) so it follows the
+   active light/dark theme automatically.
+   =========================================================================== */
+
+.landing {
+  background:
+    radial-gradient(
+      900px 520px at 8% -6%,
+      var(--naytak-primary-soft, rgba(37, 99, 235, 0.14)) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      820px 480px at 104% 4%,
+      var(--naytak-primary-soft, rgba(37, 99, 235, 0.1)) 0%,
+      transparent 55%
+    ),
+    var(--naytak-bg, #f1f5f9);
+  color: var(--naytak-text, #0f172a);
+  min-height: 100vh;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+/* ---- Top navigation ------------------------------------------------------ */
+
+.landing-nav {
+  align-items: center;
+  backdrop-filter: blur(10px);
+  background: color-mix(in srgb, var(--naytak-bg, #f1f5f9) 82%, transparent);
+  border-bottom: 1px solid var(--naytak-border, #e5e7eb);
+  display: flex;
+  gap: 24px;
+  justify-content: space-between;
+  left: 0;
+  padding: 14px clamp(20px, 5vw, 48px);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.landing-nav__brand {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.landing-nav__logo {
+  border-radius: 0.6rem;
+  box-shadow: 0 6px 18px -6px var(--naytak-primary, #2563eb);
+  display: flex;
+  height: 34px;
+  overflow: hidden;
+  width: 34px;
+}
+
+.landing-nav__logo img {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+.landing-nav__name {
+  color: var(--naytak-text, #0f172a);
+  font-size: 1rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.landing-nav__links {
+  display: flex;
+  gap: 22px;
+  margin-left: auto;
+}
+
+.landing-nav__links a {
+  color: var(--naytak-text-muted, #6b7280);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.landing-nav__links a:hover {
+  color: var(--naytak-primary, #2563eb);
+}
+
+@media (max-width: 860px) {
+  .landing-nav__links {
+    display: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .landing-nav__login {
+    display: none;
+  }
+}
+
+/* ---- Hero ---------------------------------------------------------------- */
+
+.landing-hero {
+  display: flex;
+  justify-content: center;
+  padding: clamp(48px, 8vw, 96px) 24px 48px;
+}
+
+.landing-hero__inner {
+  align-items: center;
+  display: grid;
+  gap: clamp(32px, 5vw, 64px);
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  max-width: 1120px;
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .landing-hero__inner {
+    grid-template-columns: 1fr;
+  }
+}
+
+.landing-hero__badge {
+  margin-bottom: 18px;
+}
+
+.landing-hero__title {
+  font-size: clamp(2rem, 5.2vw, 3.4rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+  margin: 0 0 18px;
+}
+
+.landing-hero__gradient {
+  background: linear-gradient(
+    100deg,
+    var(--naytak-primary, #2563eb),
+    var(--naytak-primary-light, #60a5fa)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.landing-hero__subtitle {
+  color: var(--naytak-text-muted, #6b7280);
+  font-size: 1.06rem;
+  line-height: 1.65;
+  margin: 0 0 26px;
+  max-width: 560px;
+}
+
+.landing-hero__actions {
+  flex-wrap: wrap;
+}
+
+/* Hero visual */
+
+.landing-hero__visual {
+  position: relative;
+}
+
+.landing-preview {
+  position: relative;
+  z-index: 1;
+}
+
+.landing-preview__head {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.landing-preview__title {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.landing-preview__legend {
+  align-items: center;
+  color: var(--naytak-text-muted, #6b7280);
+  display: flex;
+  font-size: 0.8rem;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.landing-preview__dot {
+  border-radius: 50%;
+  height: 9px;
+  margin-left: 6px;
+  width: 9px;
+}
+
+.landing-preview__dot--revenue {
+  background: var(--naytak-primary, #2563eb);
+}
+
+.landing-preview__dot--expenses {
+  background: var(--naytak-primary-light, #60a5fa);
+}
+
+.landing-floating {
+  box-shadow: var(--naytak-shadow-lg, 0 16px 40px rgb(30 41 59 / 18%));
+  position: absolute;
+  z-index: 2;
+}
+
+.landing-floating--pie {
+  bottom: -22px;
+  left: -26px;
+}
+
+.landing-floating--chip {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  right: -18px;
+  top: -20px;
+}
+
+.landing-floating__icon {
+  color: var(--naytak-primary, #2563eb);
+}
+
+.landing-floating--chip strong {
+  display: block;
+  font-size: 0.9rem;
+}
+
+.landing-floating--chip span {
+  color: var(--naytak-text-muted, #6b7280);
+  font-size: 0.78rem;
+}
+
+/* Floating chips on the hero are static (no float animation). */
+
+/* ---- Shared section scaffolding ----------------------------------------- */
+
+.landing-section {
+  margin: 0 auto;
+  max-width: 1120px;
+  padding: clamp(48px, 7vw, 88px) 24px;
+}
+
+.landing-section--alt {
+  border-top: 1px solid var(--naytak-border, #e5e7eb);
+  border-bottom: 1px solid var(--naytak-border, #e5e7eb);
+}
+
+.landing-section__title {
+  font-size: clamp(1.5rem, 3.4vw, 2.1rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0 0 10px;
+  text-align: center;
+}
+
+.landing-section__subtitle {
+  color: var(--naytak-text-muted, #6b7280);
+  margin: 0 auto 40px;
+  max-width: 560px;
+  text-align: center;
+}
+
+/* ---- Stats band ---------------------------------------------------------- */
+
+.landing-stats {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(6, 1fr);
+}
+
+@media (max-width: 1080px) {
+  .landing-stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .landing-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.landing-stat {
+  padding: 22px 18px;
+  text-align: center;
+}
+
+.landing-stat__icon {
+  align-items: center;
+  border-radius: 0.75rem;
+  display: inline-flex;
+  height: 44px;
+  justify-content: center;
+  margin-bottom: 12px;
+  width: 44px;
+}
+
+.landing-stat__icon--primary {
+  background: var(--naytak-primary-soft, rgba(37, 99, 235, 0.14));
+  color: var(--naytak-primary, #2563eb);
+}
+
+.landing-stat__icon--success {
+  background: color-mix(in srgb, #16a34a 14%, transparent);
+  color: #16a34a;
+}
+
+.landing-stat__icon--info {
+  background: color-mix(in srgb, #0891b2 14%, transparent);
+  color: #0891b2;
+}
+
+.landing-stat__icon--warning {
+  background: color-mix(in srgb, #d97706 14%, transparent);
+  color: #d97706;
+}
+
+.landing-stat__icon--danger {
+  background: color-mix(in srgb, #dc2626 14%, transparent);
+  color: #dc2626;
+}
+
+.landing-stat__value {
+  font-size: clamp(1.6rem, 3.4vw, 2.2rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.landing-stat__label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin-top: 8px;
+}
+
+.landing-stat__note {
+  color: var(--naytak-text-muted, #6b7280);
+  font-size: 0.75rem;
+  margin-top: 4px;
+}
+
+/* ---- Modules grid -------------------------------------------------------- */
+
+.landing-modules {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+@media (max-width: 1080px) {
+  .landing-modules {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 720px) {
+  .landing-modules {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 420px) {
+  .landing-modules {
+    grid-template-columns: 1fr;
+  }
+}
+
+.landing-module {
+  align-items: flex-start;
+  background: var(--naytak-surface, #ffffff);
+  border: 1px solid var(--naytak-border, #e5e7eb);
+  border-radius: 0.85rem;
+  color: inherit;
+  display: flex;
+  gap: 14px;
+  padding: 18px;
+  text-decoration: none;
+  transition: border-color 0.2s ease;
+}
+
+.landing-module:hover {
+  border-color: var(--naytak-primary, #2563eb);
+}
+
+.landing-module__icon {
+  align-items: center;
+  background: var(--naytak-primary-soft, rgba(37, 99, 235, 0.12));
+  border-radius: 0.6rem;
+  color: var(--naytak-primary, #2563eb);
+  display: inline-flex;
+  flex: none;
+  height: 40px;
+  justify-content: center;
+  width: 40px;
+}
+
+.landing-module__body {
+  min-width: 0;
+}
+
+.landing-module__label {
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.landing-module__desc {
+  color: var(--naytak-text-muted, #6b7280);
+  font-size: 0.78rem;
+  line-height: 1.45;
+  margin-top: 4px;
+}
+
+.landing-module__arrow {
+  color: var(--naytak-text-muted, #6b7280);
+  flex: none;
+  margin-left: auto;
+  margin-top: 10px;
+  transition: color 0.2s ease;
+}
+
+.landing-module:hover .landing-module__arrow {
+  color: var(--naytak-primary, #2563eb);
+}
+
+/* ---- Chart showcase ------------------------------------------------------ */
+
+.landing-charts {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 1.3fr 1fr;
+}
+
+@media (max-width: 900px) {
+  .landing-charts {
+    grid-template-columns: 1fr;
+  }
+}
+
+.landing-chart-card {
+  padding: 20px;
+}
+
+.landing-chart-card__title {
+  align-items: center;
+  display: flex;
+  font-size: 0.95rem;
+  font-weight: 700;
+  gap: 10px;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+/* ---- Tech stack ---------------------------------------------------------- */
+
+.landing-stack {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(6, 1fr);
+}
+
+@media (max-width: 1080px) {
+  .landing-stack {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .landing-stack {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.landing-tech {
+  padding: 18px;
+  text-align: center;
+}
+
+.landing-tech__check {
+  align-items: center;
+  background: color-mix(in srgb, #16a34a 14%, transparent);
+  border-radius: 50%;
+  color: #16a34a;
+  display: inline-flex;
+  height: 30px;
+  justify-content: center;
+  margin-bottom: 10px;
+  width: 30px;
+}
+
+.landing-tech__name {
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.landing-tech__role {
+  color: var(--naytak-primary, #2563eb);
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-top: 3px;
+}
+
+.landing-tech__note {
+  color: var(--naytak-text-muted, #6b7280);
+  font-size: 0.75rem;
+  margin-top: 6px;
+}
+
+/* ---- CTA band ------------------------------------------------------------ */
+
+.landing-cta {
+  background: linear-gradient(
+    120deg,
+    var(--naytak-primary-dark, #1d4ed8),
+    var(--naytak-primary, #2563eb)
+  );
+  color: var(--naytak-primary-contrast, #ffffff);
+  margin: 0 auto 40px;
+  max-width: 1120px;
+  padding: clamp(40px, 6vw, 64px) 24px;
+  text-align: center;
+}
+
+.landing-cta__title {
+  font-size: clamp(1.5rem, 3.4vw, 2rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0 0 10px;
+}
+
+.landing-cta__subtitle {
+  margin: 0 0 24px;
+  opacity: 0.85;
+}
+
+/* ---- Footer -------------------------------------------------------------- */
+
+.landing-footer {
+  align-items: center;
+  border-top: 1px solid var(--naytak-border, #e5e7eb);
+  color: var(--naytak-text-muted, #6b7280);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
+  margin: 0 auto;
+  max-width: 1120px;
+  padding: 22px 24px;
+}
+
+.landing-footer__brand {
+  align-items: center;
+  display: flex;
+  font-size: 0.875rem;
+  font-weight: 700;
+  gap: 8px;
+}
+
+.landing-footer__logo {
+  border-radius: 0.4rem;
+  height: 22px;
+  width: 22px;
+}
+
+.landing-footer__meta {
+  font-size: 0.8rem;
+}

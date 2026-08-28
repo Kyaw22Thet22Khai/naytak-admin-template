@@ -31,7 +31,7 @@ code {
 }
 
 /* ---------------------------------------------------------------------------
-   Naytak branded loader — spinning ring around the logo + bouncing dots.
+   Naytak branded loader — logo with a static ring + label. No animations.
    Used for page transitions and lazy routes.
    --------------------------------------------------------------------------- */
 .naytak-loader {
@@ -52,7 +52,6 @@ code {
 }
 
 .naytak-loader__ring {
-  animation: naytak-spin 0.9s linear infinite;
   border-radius: 50%;
   border: 3px solid var(--naytak-border-strong, #d1d5db);
   border-top-color: var(--naytak-primary, #2563eb);
@@ -81,47 +80,12 @@ code {
 }
 
 .naytak-loader__dots span {
-  animation: naytak-bounce 1.2s ease-in-out infinite;
   background: var(--naytak-primary, #2563eb);
   border-radius: 9999px;
   height: 5px;
   margin: 0 2px;
   opacity: 0.35;
   width: 5px;
-}
-
-.naytak-loader__dots span:nth-child(2) {
-  animation-delay: 0.15s;
-}
-
-.naytak-loader__dots span:nth-child(3) {
-  animation-delay: 0.3s;
-}
-
-@keyframes naytak-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes naytak-bounce {
-  0%,
-  60%,
-  100% {
-    opacity: 0.35;
-    transform: translateY(0);
-  }
-  30% {
-    opacity: 1;
-    transform: translateY(-4px);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .naytak-loader__ring,
-  .naytak-loader__dots span {
-    animation: none;
-  }
 }
 
 /* Margin-bottom utilities (Bootstrap-style scale) */
@@ -309,20 +273,78 @@ body {
   background: var(--naytak-primary-soft, rgba(37, 99, 235, 0.08));
 }
 
-/* Card hover lift — apply alongside Card for a gentle raise + primary border
-   tint on interaction (used on widget/product/project/file cards). */
+/* Card hover lift removed (2026-08-28) — no hover animations in the app. */
 .card-lift {
   cursor: default;
 }
 
-.card-lift:hover {
-  border-color: color-mix(
-    in srgb,
-    var(--naytak-primary, #2563eb) 40%,
-    transparent
-  );
-  box-shadow: var(--naytak-shadow-lg, 0 16px 40px rgb(30 41 59 / 18%));
-  transform: translateY(-3px);
+/* ---------------------------------------------------------------------------
+   Shared stat widget card (Dashboard + Analytics)
+   Thin colored accent strip on top + tinted icon tile. No hover animation.
+   Set `--widget-accent` to colour the strip; icon colour/bg set inline.
+   --------------------------------------------------------------------------- */
+.widget-card {
+  overflow: hidden;
+  position: relative;
+}
+
+.widget-card::before {
+  background: var(--widget-accent, #2563eb);
+  content: "";
+  height: 3px;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.widget-card .card-body {
+  align-items: flex-start;
+  display: flex;
+  gap: 14px;
+  width: 100%;
+}
+
+.widget-card__icon {
+  align-items: center;
+  border-radius: 0.75rem;
+  display: flex;
+  flex-shrink: 0;
+  height: 48px;
+  justify-content: center;
+  margin-top: 2px;
+  width: 48px;
+}
+
+.widget-card__body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.widget-card__label {
+  color: var(--naytak-text-muted, #6b7280);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.widget-card__value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 2px 0 4px;
+}
+
+.widget-card__trend {
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.widget-card__trend span {
+  color: var(--naytak-text-muted, #6b7280);
+  font-weight: 400;
+  margin-left: 4px;
 }
 
 /* Detail rows inside the detail modals — emphasize the closing (total) value. */

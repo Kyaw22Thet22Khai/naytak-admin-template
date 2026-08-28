@@ -126,19 +126,23 @@ export function ProductsPage() {
       </GridItem>
 
       <GridItem xs={12} spacing={2} className="mb-3">
-        <Stack direction="row" spacing={8} wrap className="list-toolbar">
-          <SearchInput
-            placeholder="Search products…"
-            clearable
-            value={query}
-            onChange={setQuery}
-          />
-          <Select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            options={CATEGORY_OPTIONS}
-          />
-        </Stack>
+        <Card
+          title="All products"
+          subtitle={`${filtered.length} product${filtered.length === 1 ? "" : "s"}`}>
+          <Stack direction="row" spacing={8} wrap className="list-toolbar">
+            <SearchInput
+              placeholder="Search products…"
+              clearable
+              value={query}
+              onChange={setQuery}
+            />
+            <Select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              options={CATEGORY_OPTIONS}
+            />
+          </Stack>
+        </Card>
       </GridItem>
 
       {filtered.length > 0 ? (
@@ -155,7 +159,7 @@ export function ProductsPage() {
                 lg={4}
                 spacing={2}
                 className="mb-2">
-                <Card className="h-100 product-card card-lift">
+                <Card className="h-100 product-card">
                   <Stack direction="row" spacing={14}>
                     <div
                       className="product-card__icon"

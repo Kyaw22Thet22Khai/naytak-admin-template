@@ -1,6 +1,15 @@
-import { Grid, GridItem } from "naytak-react-ui";
+import {
+  Badge,
+  Button,
+  Grid,
+  GridItem,
+  IconArrowRight,
+  IconPulse,
+} from "naytak-react-ui";
+import { Link } from "react-router-dom";
 import { useDocumentTitle } from "../../hooks/useDocumentTitle";
 import { PageHeader } from "../../components/pageHeader";
+import { ROUTES } from "../../app/routes";
 import { WidgetCards } from "./components/widgetCards";
 import { SalesChart } from "./components/salesChart";
 import { CategoryChart } from "./components/categoryChart";
@@ -17,6 +26,24 @@ export function DashboardPage() {
         <PageHeader
           title="Dashboard"
           subtitle="A live overview of your store's performance"
+          actions={
+            <>
+              <Badge
+                color="success"
+                variant="soft"
+                leftIcon={<IconPulse size={14} />}>
+                Live · Last 30 days
+              </Badge>
+              <Button
+                variant="ghost"
+                size="sm"
+                as={Link}
+                to={ROUTES.analytics}
+                rightIcon={<IconArrowRight size={15} />}>
+                View analytics
+              </Button>
+            </>
+          }
         />
       </GridItem>
       <GridItem xs={12} className="mb-2">

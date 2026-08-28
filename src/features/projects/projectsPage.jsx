@@ -87,19 +87,23 @@ export function ProjectsPage() {
       </GridItem>
 
       <GridItem xs={12} spacing={2} className="mb-3">
-        <Stack direction="row" spacing={8} wrap className="list-toolbar">
-          <SearchInput
-            placeholder="Search projects…"
-            clearable
-            value={query}
-            onChange={setQuery}
-          />
-          <Select
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            options={STATUS_OPTIONS}
-          />
-        </Stack>
+        <Card
+          title="All projects"
+          subtitle={`${filtered.length} project${filtered.length === 1 ? "" : "s"}`}>
+          <Stack direction="row" spacing={8} wrap className="list-toolbar">
+            <SearchInput
+              placeholder="Search projects…"
+              clearable
+              value={query}
+              onChange={setQuery}
+            />
+            <Select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              options={STATUS_OPTIONS}
+            />
+          </Stack>
+        </Card>
       </GridItem>
 
       {filtered.length > 0 ? (
@@ -112,7 +116,7 @@ export function ProjectsPage() {
               lg={4}
               spacing={2}
               className="mb-2">
-              <Card className="h-100 project-card card-lift">
+              <Card className="h-100 project-card">
                 <div className="project-card__head">
                   <div className="project-card__icon">
                     <IconFolder size={22} />

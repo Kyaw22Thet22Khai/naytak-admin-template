@@ -20,7 +20,9 @@ import {
  * Add new paths here and register the page in app/router.js.
  */
 export const ROUTES = {
-  dashboard: "/",
+  /** Public landing page — the entry point shown before the admin shell. */
+  landing: "/",
+  dashboard: "/dashboard",
   login: "/login",
   register: "/register",
   analytics: "/analytics",

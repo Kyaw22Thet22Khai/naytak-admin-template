@@ -75,6 +75,7 @@ export function MediaPage() {
               </Button>
               <Button
                 size="sm"
+                variant="ghost"
                 leftIcon={<IconPlus size={16} />}
                 onClick={() => toast.info("New folder coming soon")}>
                 New folder
@@ -85,19 +86,23 @@ export function MediaPage() {
       </GridItem>
 
       <GridItem xs={12} spacing={2} className="mb-3">
-        <Stack direction="row" spacing={8} wrap className="list-toolbar">
-          <SearchInput
-            placeholder="Search files…"
-            clearable
-            value={query}
-            onChange={setQuery}
-          />
-          <Select
-            value={type}
-            onChange={(e) => setType(e.target.value)}
-            options={TYPE_OPTIONS}
-          />
-        </Stack>
+        <Card
+          title="All files"
+          subtitle={`${filtered.length} file${filtered.length === 1 ? "" : "s"}`}>
+          <Stack direction="row" spacing={8} wrap className="list-toolbar">
+            <SearchInput
+              placeholder="Search files…"
+              clearable
+              value={query}
+              onChange={setQuery}
+            />
+            <Select
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+              options={TYPE_OPTIONS}
+            />
+          </Stack>
+        </Card>
       </GridItem>
 
       {filtered.length > 0 ? (
@@ -113,7 +118,7 @@ export function MediaPage() {
                 lg={3}
                 spacing={2}
                 className="mb-2">
-                <Card className="h-100 file-card card-lift">
+                <Card className="h-100 file-card">
                   <Stack direction="row" spacing={12} align="center">
                     <div
                       className="file-card__icon"
