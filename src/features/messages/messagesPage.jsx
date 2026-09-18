@@ -1,75 +1,78 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   Avatar,
   Button,
   Card,
-  EmptyState,
   Grid,
   GridItem,
   IconMail,
+  IconMailCheck,
   IconPen,
-  SearchInput,
-  Select,
-  Stack,
   useToast,
 } from "naytak-react-ui";
 import { useDocumentTitle } from "../../hooks/useDocumentTitle";
+import { useListState } from "../../hooks/useListState";
+import { useCollection } from "../../app/dataContext";
 import { PageHeader } from "../../components/pageHeader";
+import { ListToolbar } from "../../components/listToolbar";
+import {
+  ListEmptyState,
+  ListPagination,
+  listTitle,
+} from "../../components/listResults";
 import { formatDate } from "../../utils/format";
+import { withNote } from "../../components/titleNote";
 import { ComposeMessageModal } from "./components/composeMessageModal";
-import { FOLDER_OPTIONS, MESSAGES } from "./data/mock";
+import { FOLDER_OPTIONS } from "./data/mock";
 import "./messages.css";
+
+/** Folder filter is a view over `unread`, not a stored field. */
+const matchesFolder = (message, value) =>
+  (value === "unread" && message.unread) ||
+  (value === "read" && !message.unread);
+
+/** Stable list config — useListState memoizes on these identities. */
+const SEARCH_KEYS = ["sender", "subject", "snippet"];
+const FILTERS = { folder: matchesFolder };
 
 export function MessagesPage() {
   useDocumentTitle("Messages");
   const toast = useToast();
-
-  const [messages, setMessages] = useState(MESSAGES);
-  const [query, setQuery] = useState("");
-  const [folder, setFolder] = useState("all");
+  const messages = useCollection("messages");
   const [composeOpen, setComposeOpen] = useState(false);
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return messages.filter((message) => {
-      const matchesQuery =
-        !q ||
-        message.sender.toLowerCase().includes(q) ||
-        message.subject.toLowerCase().includes(q);
-      const matchesFolder =
-        folder === "all" ||
-        (folder === "unread" && message.unread) ||
-        (folder === "read" && !message.unread);
-      return matchesQuery && matchesFolder;
-    });
-  }, [messages, query, folder]);
+  const list = useListState({
+    items: messages.items,
+    searchKeys: SEARCH_KEYS,
+    filters: FILTERS,
+    defaultSort: "time",
+    pageSize: 10,
+  });
 
-  const unreadCount = messages.filter((m) => m.unread).length;
+  const unreadCount = messages.items.filter((m) => m.unread).length;
 
-  const toggleRead = (id) => {
-    setMessages((prev) =>
-      prev.map((message) =>
-        message.id === id ? { ...message, unread: !message.unread } : message,
-      ),
-    );
-    const message = messages.find((m) => m.id === id);
-    toast.success(message?.unread ? "Marked as read" : "Marked as unread");
+  const toggleRead = (message) => {
+    messages.update(message.id, { unread: !message.unread });
+    toast.success(message.unread ? "Marked as read" : "Marked as unread");
+  };
+
+  const markAllRead = () => {
+    messages.items
+      .filter((message) => message.unread)
+      .forEach((message) => messages.update(message.id, { unread: false }));
+    toast.success("All messages marked as read");
   };
 
   const handleSend = ({ to, subject, body }) => {
-    setMessages((prev) => [
-      {
-        id: Date.now(),
-        sender: to,
-        email: "",
-        subject,
-        snippet: body,
-        time: new Date().toISOString(),
-        unread: true,
-      },
-      ...prev,
-    ]);
-    setFolder("all");
+    const sent = messages.add({
+      sender: to,
+      email: to,
+      subject,
+      snippet: body,
+      time: new Date().toISOString(),
+      unread: false,
+    });
+    list.revealItem(sent);
     setComposeOpen(false);
     toast.success("Message sent");
   };
@@ -78,101 +81,123 @@ export function MessagesPage() {
     <Grid container fluid>
       <GridItem xs={12} spacing={2} className="mb-3">
         <PageHeader
-          title="Messages"
-          subtitle={`${unreadCount} unread of ${messages.length}`}
+          title={withNote(
+            "Messages",
+            `${unreadCount} unread of ${messages.items.length}`,
+          )}
           actions={
-            <Button
-              size="sm"
-              leftIcon={<IconPen size={16} />}
-              onClick={() => setComposeOpen(true)}>
-              Compose
-            </Button>
+            <>
+              <Button
+                size="sm"
+                variant="ghost"
+                disabled={unreadCount === 0}
+                leftIcon={<IconMailCheck size={16} />}
+                onClick={markAllRead}>
+                Mark all read
+              </Button>
+              <Button
+                size="sm"
+                leftIcon={<IconPen size={16} />}
+                onClick={() => setComposeOpen(true)}>
+                Compose
+              </Button>
+            </>
           }
         />
       </GridItem>
 
       <GridItem xs={12} spacing={2}>
-        <Card
-          title="Inbox"
-          subtitle={`${filtered.length} message${filtered.length === 1 ? "" : "s"}`}>
-          <Stack direction="row" spacing={8} wrap className="mb-3 list-toolbar">
-            <SearchInput
-              placeholder="Search sender or subject…"
-              clearable
-              value={query}
-              onChange={setQuery}
+        <Card title={listTitle("Inbox", list)}>
+          <div className="mb-3">
+            <ListToolbar
+              list={list}
+              searchPlaceholder="Search sender or subject…"
+              filters={[
+                { name: "folder", label: "Folder", options: FOLDER_OPTIONS },
+              ]}
             />
-            <Select
-              value={folder}
-              onChange={(e) => setFolder(e.target.value)}
-              options={FOLDER_OPTIONS}
-            />
-          </Stack>
+          </div>
 
-          {filtered.length > 0 ? (
-            filtered.map((message) => (
-              <div
-                key={message.id}
-                className={
-                  message.unread
-                    ? "message-row message-row--unread"
-                    : "message-row"
-                }>
-                <span
-                  className="message-row__indicator"
-                  style={{ visibility: message.unread ? "visible" : "hidden" }}
-                />
-                <Avatar size="sm" text={message.sender} />
-                <div className="message-row__body">
-                  <div className="message-row__head">
-                    <span
+          {list.visible.length > 0 ? (
+            <ul className="message-list">
+              {list.visible.map((message) => (
+                <li
+                  key={message.id}
+                  className={
+                    message.unread
+                      ? "message-row message-row--unread"
+                      : "message-row"
+                  }>
+                  <span
+                    className="message-row__indicator"
+                    aria-hidden="true"
+                    style={{
+                      visibility: message.unread ? "visible" : "hidden",
+                    }}
+                  />
+                  <Avatar size="sm" text={message.sender} />
+                  <div className="message-row__body">
+                    <div className="message-row__head">
+                      <span
+                        className={
+                          message.unread
+                            ? "message-row__sender message-row__sender--unread"
+                            : "message-row__sender"
+                        }>
+                        {message.sender}
+                        {message.unread && (
+                          <span className="sr-only"> (unread)</span>
+                        )}
+                      </span>
+                      <span className="message-row__time">
+                        {formatDate(message.time, {
+                          dateStyle: "medium",
+                          timeStyle: "short",
+                        })}
+                      </span>
+                    </div>
+                    <div
                       className={
                         message.unread
-                          ? "message-row__sender message-row__sender--unread"
-                          : "message-row__sender"
+                          ? "message-row__subject message-row__subject--unread"
+                          : "message-row__subject"
                       }>
-                      {message.sender}
-                    </span>
-                    <span className="message-row__time">
-                      {formatDate(message.time, {
-                        dateStyle: "medium",
-                        timeStyle: "short",
-                      })}
-                    </span>
+                      {message.subject}
+                    </div>
+                    <div className="message-row__snippet">
+                      {message.snippet}
+                    </div>
                   </div>
-                  <div
-                    className={
-                      message.unread
-                        ? "message-row__subject message-row__subject--unread"
-                        : "message-row__subject"
-                    }>
-                    {message.subject}
-                  </div>
-                  <div className="message-row__snippet">{message.snippet}</div>
-                </div>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => toggleRead(message.id)}>
-                  {message.unread ? "Mark read" : "Mark unread"}
-                </Button>
-              </div>
-            ))
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => toggleRead(message)}>
+                    {message.unread ? "Mark read" : "Mark unread"}
+                  </Button>
+                </li>
+              ))}
+            </ul>
           ) : (
-            <EmptyState
+            <ListEmptyState
+              list={list}
+              noun="message"
               icon={<IconMail size={28} />}
-              title="No messages found"
-              description="Try a different search term or folder."
+              onCreate={() => setComposeOpen(true)}
+              createLabel="Compose"
             />
           )}
+
+          <ListPagination list={list} noun="message" />
         </Card>
       </GridItem>
 
-      <ComposeMessageModal
-        open={composeOpen}
-        onClose={() => setComposeOpen(false)}
-        onSend={handleSend}
-      />
+      {composeOpen && (
+        <ComposeMessageModal
+          open
+          onClose={() => setComposeOpen(false)}
+          onSend={handleSend}
+        />
+      )}
     </Grid>
   );
 }

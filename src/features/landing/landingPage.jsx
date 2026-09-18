@@ -7,13 +7,14 @@ import {
   IconCheck,
   IconRocket,
   IconSparkles,
-  LineChart,
+  GroupedBarChart,
   PieChart,
   Stack,
 } from "naytak-react-ui";
 import { useDocumentTitle } from "../../hooks/useDocumentTitle";
 import { APP_NAME, APP_VERSION } from "../../constants/app";
 import { ROUTES } from "../../app/routes";
+import { ThemeToggle } from "../../components/themeToggle";
 import { TEMPLATE_STATS, MODULES, TECH_STACK } from "./data/stats";
 import { REVENUE_SERIES, CATEGORY_SALES } from "../dashboard/data/mock";
 import logo from "../../assets/logo.svg";
@@ -27,14 +28,14 @@ import "./landing.css";
 export function LandingPage() {
   useDocumentTitle("Welcome");
 
-  // Revenue & Expenses preview (from the dashboard mock data).
-  const revenueData = REVENUE_SERIES[0].data.map((point) => ({
-    ...point,
-    y: Math.round(point.y / 1000),
-  }));
-  const expensesData = REVENUE_SERIES[1].data.map((point) => ({
-    ...point,
-    y: Math.round(point.y / 1000),
+  // Revenue & Expenses preview (from the dashboard mock data), scaled to
+  // thousands so the axis labels stay readable at preview size.
+  const previewSeries = REVENUE_SERIES.map((series) => ({
+    ...series,
+    data: series.data.map((point) => ({
+      ...point,
+      y: Math.round(point.y / 1000),
+    })),
   }));
 
   return (
@@ -56,7 +57,8 @@ export function LandingPage() {
           <a href="#charts">Charts</a>
           <a href="#stack">Stack</a>
         </nav>
-        <Stack direction="row" spacing={10}>
+        <Stack direction="row" spacing={10} align="center">
+          <ThemeToggle />
           <Button
             variant="ghost"
             size="sm"
@@ -122,13 +124,11 @@ export function LandingPage() {
                   Live mock data
                 </Badge>
               </div>
-              <LineChart
-                data={revenueData}
+              <GroupedBarChart
+                series={previewSeries}
                 height={220}
-                fill
-                curve
-                showPoints={false}
-                ariaLabel="Revenue preview chart"
+                showLegend={false}
+                ariaLabel="Revenue and expenses preview chart"
               />
               <div className="landing-preview__legend">
                 <span className="landing-preview__dot landing-preview__dot--revenue" />
@@ -232,14 +232,12 @@ export function LandingPage() {
             <div className="landing-chart-card__title">
               Revenue vs Expenses{" "}
               <Badge size="sm" color="info" variant="soft">
-                area · bar · line
+                grouped bars
               </Badge>
             </div>
-            <LineChart
-              data={revenueData}
+            <GroupedBarChart
+              series={previewSeries}
               height={240}
-              fill
-              curve
               ariaLabel="Revenue vs expenses chart"
             />
           </Card>

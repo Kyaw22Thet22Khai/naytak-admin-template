@@ -23,7 +23,7 @@ export function NotificationPanel({
 
       <div className="notif-panel__list">
         {notifications.length === 0 ? (
-          <div className="notif-panel__empty">You're all caught up</div>
+          <div className="notif-panel__empty">You’re all caught up</div>
         ) : (
           notifications.map((notification) => (
             <button

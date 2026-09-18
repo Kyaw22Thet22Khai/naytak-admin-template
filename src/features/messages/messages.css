@@ -3,11 +3,11 @@
 .message-row {
   align-items: center;
   border-bottom: 1px solid var(--naytak-border, #e5e7eb);
-  border-radius: 0.5rem;
+  border-radius: var(--radius-sm);
   display: flex;
-  gap: 12px;
-  margin: 0 -8px;
-  padding: 12px 8px;
+  gap: var(--space-3);
+  margin: 0 calc(var(--space-2) * -1);
+  padding: var(--space-3) var(--space-2);
 }
 
 .message-row--unread {
@@ -20,7 +20,7 @@
 
 .message-row__indicator {
   background: var(--naytak-primary, #2563eb);
-  border-radius: 9999px;
+  border-radius: var(--radius-pill);
   flex-shrink: 0;
   height: 8px;
   width: 8px;
@@ -33,12 +33,12 @@
 
 .message-row__head {
   display: flex;
-  gap: 8px;
+  gap: var(--space-2);
   justify-content: space-between;
 }
 
 .message-row__sender {
-  font-size: 0.875rem;
+  font-size: var(--text-base);
   font-weight: 600;
 }
 
@@ -48,12 +48,12 @@
 
 .message-row__time {
   color: var(--naytak-text-muted, #6b7280);
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   white-space: nowrap;
 }
 
 .message-row__subject {
-  font-size: 0.875rem;
+  font-size: var(--text-base);
   margin-top: 1px;
 }
 
@@ -63,7 +63,7 @@
 
 .message-row__snippet {
   color: var(--naytak-text-muted, #6b7280);
-  font-size: 0.8125rem;
+  font-size: var(--text-sm);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -85,7 +85,7 @@
 
   .message-row > .btn {
     margin-left: auto;
-    margin-top: 4px;
+    margin-top: var(--space-1);
     order: 3;
   }
 }

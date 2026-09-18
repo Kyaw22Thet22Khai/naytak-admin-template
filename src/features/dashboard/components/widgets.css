@@ -4,29 +4,29 @@
 /* ---- Traffic sources -------------------------------------------------------- */
 
 .traffic-item {
-  margin: 14px 0;
+  margin: var(--space-4) 0;
 }
 
 .traffic-item:first-child {
-  margin-top: 4px;
+  margin-top: var(--space-1);
 }
 
 .traffic-item:last-child {
-  margin-bottom: 4px;
+  margin-bottom: var(--space-1);
 }
 
 .traffic-item__head {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 2px;
+  margin-bottom: var(--space-1);
 }
 
 .traffic-item__label {
-  font-size: 0.875rem;
+  font-size: var(--text-base);
   font-weight: 600;
 }
 
 .traffic-item__visits {
   color: var(--naytak-text-muted, #6b7280);
-  font-size: 0.8125rem;
+  font-size: var(--text-sm);
 }

@@ -3,10 +3,10 @@
 .calendar-event {
   border-bottom: 1px solid var(--naytak-border, #e5e7eb);
   border-left: 3px solid var(--event-accent, var(--naytak-primary, #2563eb));
-  border-radius: 0.5rem;
+  border-radius: var(--radius-sm);
   display: flex;
-  gap: 14px;
-  padding: 12px 12px 12px 10px;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-3);
 }
 
 .calendar-event:last-of-type {
@@ -15,22 +15,22 @@
 
 .calendar-event__date {
   background: color-mix(in srgb, var(--event-accent, #2563eb) 14%, transparent);
-  border-radius: 0.5rem;
+  border-radius: var(--radius-sm);
   color: var(--event-accent, #2563eb);
   flex-shrink: 0;
-  padding: 6px 0;
+  padding: var(--space-2) 0;
   text-align: center;
   width: 52px;
 }
 
 .calendar-event__day {
-  font-size: 1.25rem;
+  font-size: var(--text-lg);
   font-weight: 700;
   line-height: 1.1;
 }
 
 .calendar-event__month {
-  font-size: 0.6875rem;
+  font-size: var(--text-xs);
   letter-spacing: 0.04em;
   opacity: 0.78;
   text-transform: uppercase;
@@ -42,22 +42,22 @@
 }
 
 .calendar-event__title {
-  font-size: 0.9375rem;
+  font-size: var(--text-md);
   font-weight: 600;
   margin: 0;
 }
 
 .calendar-event__meta {
   color: var(--naytak-text-muted, #6b7280);
-  font-size: 0.8125rem;
-  margin-top: 2px;
+  font-size: var(--text-sm);
+  margin-top: var(--space-1);
 }
 
 .calendar-event__actions {
   align-items: center;
   display: flex;
   flex-shrink: 0;
-  gap: 4px;
+  gap: var(--space-1);
   margin-left: auto;
 }
 
@@ -65,17 +65,17 @@
   align-items: center;
   border-bottom: 1px solid var(--naytak-border, #e5e7eb);
   display: flex;
-  gap: 10px;
-  padding: 10px 0;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
 }
 
 .calendar-week:first-of-type {
-  padding-top: 2px;
+  padding-top: var(--space-1);
 }
 
 .calendar-week:last-of-type {
   border-bottom: none;
-  padding-bottom: 2px;
+  padding-bottom: var(--space-1);
 }
 
 .calendar-week__day {
@@ -91,7 +91,7 @@
 @media (max-width: 599px) {
   .calendar-event {
     flex-wrap: wrap;
-    gap: 6px;
+    gap: var(--space-2);
   }
 
   .calendar-event__body {
@@ -100,13 +100,13 @@
 
   .calendar-event__meta {
     flex-wrap: wrap;
-    gap: 8px 16px;
+    gap: var(--space-2) var(--space-4);
   }
 
   .calendar-event__actions {
     justify-content: flex-end;
     margin-left: 0;
-    padding-top: 6px;
+    padding-top: var(--space-2);
     width: 100%;
   }
 }

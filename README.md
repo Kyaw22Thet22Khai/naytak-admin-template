@@ -1,70 +1,138 @@
-# Getting Started with Create React App
+# Naytak Admin
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A React admin dashboard template built on [naytak-react-ui](https://www.npmjs.com/package/naytak-react-ui), with 15 ready-made modules, a guarded auth flow, and sample data you can edit.
 
-## Available Scripts
+React 19 · Vite 7 · React Router 6 · Vitest
 
-In the project directory, you can run:
+## Quick start
 
-### `npm start`
+```bash
+npm install
+npm run dev        # http://127.0.0.1:3000
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Sign in with the demo account (the sign-in screen also has a "Fill demo credentials" button):
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+```
+alice@naytak.io / naytak123
+```
 
-### `npm test`
+## Scripts
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+| Command           | What it does                                         |
+| ----------------- | ---------------------------------------------------- |
+| `npm run dev`     | Dev server with hot reload (`npm start` is an alias) |
+| `npm run build`   | Production build into `dist/`                        |
+| `npm run preview` | Serve the built `dist/` locally                      |
+| `npm test`        | Run the test suite (`test:watch` for watch mode)     |
+| `npm run lint`    | ESLint (`lint:fix` to auto-fix)                      |
+| `npm run format`  | Prettier (`format:check` to verify only)             |
+| `npm run deploy`  | Build and publish `dist/` to GitHub Pages            |
 
-### `npm run build`
+## How it is put together
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```
+src/
+  app/          providers, router, routes, auth + data contexts
+  components/   shared UI (list toolbar, form field, undo bar, …)
+  features/     one folder per module: page, components, mock data
+  hooks/        useListState, useForm, useLocalStorage, useMediaQuery
+  layouts/      the admin shell (sidebar, navbar, breadcrumb)
+  utils/        formatting, CSV export, project ZIP export
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Data
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+There is no backend. `app/dataContext.jsx` seeds every collection from the
+`features/*/data/mock.js` files and stores changes in `localStorage`, so records
+you add, edit or delete survive a reload and are shared across pages — a product
+you add shows up in the dashboard totals.
 
-### `npm run eject`
+Pages read and write through `useCollection`:
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```jsx
+const products = useCollection("products");
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+products.add({ name: "Widget", price: 20 });
+products.update(id, { price: 25 });
+products.remove(id);
+products.restore(record, index); // used by the undo bar
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+**To point this at a real API**, replace the body of `DataProvider` with your
+fetches. Every page consumes the same `useCollection` shape, so nothing else has
+to change. Settings → Data has a button that restores the original sample data.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### Auth
 
-## Learn More
+`app/authContext.jsx` holds the session. `ProtectedRoute` guards the admin shell
+and remembers where a signed-out visitor was heading, so sign-in returns them
+there. Swap the body of `signIn` for a call to your own endpoint.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### List pages
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Search, filters, sorting and pagination all live in `hooks/useListState.js`, and
+all of it is mirrored into the URL — so a filtered view can be bookmarked and
+shared, and the Back button restores it.
 
-### Code Splitting
+```jsx
+// Declare these at module level: the hook memoizes on their identity.
+const SEARCH_KEYS = ["name", "email"];
+const FILTERS = { status: (row, value) => row.status === value };
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+const list = useListState({
+  items: users.items,
+  searchKeys: SEARCH_KEYS,
+  filters: FILTERS,
+  defaultSort: "name",
+  pageSize: 8,
+});
+```
 
-### Analyzing the Bundle Size
+Pair it with `<ListToolbar>`, `<SortableTh>`, `<ListPagination>` and
+`<ListEmptyState>`. After saving a record, call `list.revealItem(saved)` so the
+user actually sees it, whatever the active sort and filters are.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### Forms
 
-### Making a Progressive Web App
+`hooks/useForm.js` gives you values, per-field errors and submit handling.
+Errors appear on blur once a field is touched, and on submit for every field.
+Wrap each control in `<FormField error={…}>` so the message renders with the
+right `aria-invalid` / `aria-describedby` wiring.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+```jsx
+const validate = buildValidator({
+  email: [required("Email"), email],
+  password: [required("Password"), minLength(6, "Password")],
+});
+```
 
-### Advanced Configuration
+Form modals are rendered only while open (`{formOpen && <Modal … />}`), which is
+what resets them between uses.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### Adding a module
 
-### Deployment
+1. Add the path to `ROUTES` and an entry to `NAV_ITEMS` in `app/routes.js`.
+2. Create `features/<name>/` with a page and an `index.js` barrel export.
+3. Register a lazy route in `app/router.jsx`.
+4. If it has records, add them to `SEED` in `app/dataContext.jsx`.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+### Theming and breakpoints
 
-### `npm run build` fails to minify
+`app/theme.js` sets the initial color mode and brand color; the user's choice is
+remembered. Custom CSS uses the `--naytak-*` variables (with literal fallbacks)
+so it follows both the brand color and the dark theme.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Breakpoints live in `constants/app.js` and are the single source of truth for CSS
+and JS alike — every `@media (max-width: …)` uses one of those values minus 1,
+and JS reads them through `hooks/useMediaQuery.js`.
+
+## Deploying
+
+Pushing to `master` triggers `.github/workflows/deploy.yml`, which builds and
+publishes `dist/` to the `gh-pages` branch. The workflow passes the repository
+name as `VITE_BASE_PATH`, which sets both the asset base and the router
+basename — so a fork deploys correctly with no code changes.
+
+Routing uses the History API (no `#`). A Vite plugin writes `dist/404.html` as a
+copy of `index.html` so deep links survive a refresh on GitHub Pages.

@@ -1,18 +1,14 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   Badge,
   Button,
   Card,
-  EmptyState,
   Grid,
   GridItem,
-  IconDownload,
   IconEye,
   IconFileText,
   IconPlus,
-  Pagination,
-  SearchInput,
-  Select,
+  IconPrinter,
   Stack,
   Table,
   TableBody,
@@ -20,52 +16,69 @@ import {
   useToast,
 } from "naytak-react-ui";
 import { useDocumentTitle } from "../../hooks/useDocumentTitle";
+import { useListState } from "../../hooks/useListState";
+import { useCollection } from "../../app/dataContext";
 import { PageHeader } from "../../components/pageHeader";
+import { ListToolbar, SortableTh } from "../../components/listToolbar";
+import {
+  ListEmptyState,
+  ListPagination,
+  listTitle,
+} from "../../components/listResults";
 import { InvoiceDetailModal } from "./components/invoiceDetailModal";
+import { InvoiceFormModal } from "./components/invoiceFormModal";
+import { printInvoice } from "./printInvoice";
 import { formatCurrency, formatDate, capitalize } from "../../utils/format";
-import { INVOICES, STATUS_COLORS, STATUS_OPTIONS } from "./data/mock";
+import { withNote } from "../../components/titleNote";
+import { STATUS_COLORS, STATUS_OPTIONS } from "./data/mock";
 
-const PAGE_SIZE = 8;
+/** Stable list config — useListState memoizes on these identities. */
+const SEARCH_KEYS = ["id", "customer"];
+const FILTERS = { status: (invoice, value) => invoice.status === value };
 
 export function InvoicesPage() {
   useDocumentTitle("Invoices");
   const toast = useToast();
+  const invoices = useCollection("invoices");
 
-  const [query, setQuery] = useState("");
-  const [status, setStatus] = useState("all");
-  const [page, setPage] = useState(1);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [formOpen, setFormOpen] = useState(false);
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return INVOICES.filter((invoice) => {
-      const matchesQuery =
-        !q ||
-        invoice.id.toLowerCase().includes(q) ||
-        invoice.customer.toLowerCase().includes(q);
-      const matchesStatus = status === "all" || invoice.status === status;
-      return matchesQuery && matchesStatus;
-    });
-  }, [query, status]);
+  const list = useListState({
+    items: invoices.items,
+    searchKeys: SEARCH_KEYS,
+    filters: FILTERS,
+    defaultSort: "issued",
+    pageSize: 8,
+  });
 
-  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const currentPage = Math.min(page, pageCount);
-  const visibleInvoices = filtered.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE,
-  );
+  const handleCreate = (data) => {
+    const created = invoices.add(data);
+    list.revealItem(created);
+    setFormOpen(false);
+    toast.success(`Invoice ${created.id} created`);
+  };
+
+  // Opens the invoice in a print window — the browser's own "Save as PDF" is
+  // a real PDF, and costs no dependency.
+  const handlePrint = (invoice) => {
+    const opened = printInvoice(invoice);
+    if (!opened) toast.error("Allow pop-ups to print or save this invoice.");
+  };
 
   return (
     <Grid container fluid>
       <GridItem xs={12} spacing={2} className="mb-3">
         <PageHeader
-          title="Invoices"
-          subtitle="Track issued invoices and payment status"
+          title={withNote(
+            "Invoices",
+            "Track issued invoices and payment status",
+          )}
           actions={
             <Button
               size="sm"
               leftIcon={<IconPlus size={16} />}
-              onClick={() => toast.info("New invoice form coming soon")}>
+              onClick={() => setFormOpen(true)}>
               New invoice
             </Button>
           }
@@ -73,42 +86,47 @@ export function InvoicesPage() {
       </GridItem>
 
       <GridItem xs={12} spacing={2}>
-        <Card
-          title="All invoices"
-          subtitle={`${filtered.length} invoice${filtered.length === 1 ? "" : "s"}`}>
-          <Stack direction="row" spacing={8} wrap className="mb-3 list-toolbar">
-            <SearchInput
-              placeholder="Search invoice ID or customer…"
-              clearable
-              value={query}
-              onChange={setQuery}
+        <Card title={listTitle("All invoices", list)}>
+          <div className="mb-3">
+            <ListToolbar
+              list={list}
+              searchPlaceholder="Search invoice ID or customer…"
+              filters={[
+                { name: "status", label: "Status", options: STATUS_OPTIONS },
+              ]}
             />
-            <Select
-              value={status}
-              onChange={(e) => {
-                setStatus(e.target.value);
-                setPage(1);
-              }}
-              options={STATUS_OPTIONS}
-            />
-          </Stack>
+          </div>
 
-          {visibleInvoices.length > 0 ? (
+          {list.visible.length > 0 ? (
             <div className="table-scroll">
               <Table>
                 <TableHead color="primary">
                   <tr>
-                    <th>Invoice</th>
-                    <th>Customer</th>
-                    <th>Issued</th>
-                    <th>Due</th>
-                    <th>Amount</th>
-                    <th>Status</th>
-                    <th style={{ textAlign: "right" }}>Actions</th>
+                    <SortableTh list={list} field="id">
+                      Invoice
+                    </SortableTh>
+                    <SortableTh list={list} field="customer">
+                      Customer
+                    </SortableTh>
+                    <SortableTh list={list} field="issued">
+                      Issued
+                    </SortableTh>
+                    <SortableTh list={list} field="due">
+                      Due
+                    </SortableTh>
+                    <SortableTh list={list} field="amount">
+                      Amount
+                    </SortableTh>
+                    <SortableTh list={list} field="status">
+                      Status
+                    </SortableTh>
+                    <th scope="col" style={{ textAlign: "right" }}>
+                      Actions
+                    </th>
                   </tr>
                 </TableHead>
                 <TableBody>
-                  {visibleInvoices.map((invoice) => (
+                  {list.visible.map((invoice) => (
                     <tr key={invoice.id}>
                       <td>{invoice.id}</td>
                       <td>{invoice.customer}</td>
@@ -126,11 +144,10 @@ export function InvoicesPage() {
                           <Button
                             size="sm"
                             variant="ghost"
-                            leftIcon={<IconDownload size={16} />}
-                            onClick={() =>
-                              toast.info("Invoice PDF coming soon")
-                            }>
-                            PDF
+                            aria-label={`Print invoice ${invoice.id}`}
+                            leftIcon={<IconPrinter size={16} />}
+                            onClick={() => handlePrint(invoice)}>
+                            Print
                           </Button>
                           <Button
                             size="sm"
@@ -147,22 +164,16 @@ export function InvoicesPage() {
               </Table>
             </div>
           ) : (
-            <EmptyState
+            <ListEmptyState
+              list={list}
+              noun="invoice"
               icon={<IconFileText size={28} />}
-              title="No invoices found"
-              description="Try a different search term or status filter."
+              onCreate={() => setFormOpen(true)}
+              createLabel="New invoice"
             />
           )}
 
-          {pageCount > 1 && (
-            <div className="list-pagination">
-              <Pagination
-                currentPage={currentPage}
-                totalPages={pageCount}
-                onPageChange={setPage}
-              />
-            </div>
-          )}
+          <ListPagination list={list} noun="invoice" />
         </Card>
       </GridItem>
 
@@ -170,6 +181,14 @@ export function InvoicesPage() {
         <InvoiceDetailModal
           invoice={selectedInvoice}
           onClose={() => setSelectedInvoice(null)}
+        />
+      )}
+
+      {formOpen && (
+        <InvoiceFormModal
+          open
+          onClose={() => setFormOpen(false)}
+          onSave={handleCreate}
         />
       )}
     </Grid>

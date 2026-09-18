@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import {
   Button,
   IconCheck,
@@ -7,6 +6,13 @@ import {
   Select,
   Stack,
 } from "naytak-react-ui";
+import { FormField } from "../../../components/formField";
+import {
+  useForm,
+  buildValidator,
+  required,
+  positiveNumber,
+} from "../../../hooks/useForm";
 import { CATEGORY_OPTIONS } from "../data/mock";
 
 /** Categories shown in the form (excludes the "All categories" filter entry). */
@@ -40,6 +46,19 @@ const EMPTY_FORM = {
   icon: "laptop",
 };
 
+const validate = buildValidator({
+  name: [required("Name")],
+  price: [required("Price"), positiveNumber("Price")],
+  stock: [
+    required("Stock"),
+    positiveNumber("Stock"),
+    (value) =>
+      value !== "" && !Number.isInteger(Number(value))
+        ? "Stock must be a whole number."
+        : undefined,
+  ],
+});
+
 /**
  * Modal form for creating or editing a product.
  * - `product` = null → "Add product" mode (starts empty).
@@ -47,36 +66,28 @@ const EMPTY_FORM = {
  */
 export function ProductFormModal({ open, product, onClose, onSave }) {
   const isEdit = Boolean(product);
-  const [form, setForm] = useState(EMPTY_FORM);
 
-  // Reset the form whenever the modal opens (fresh or prefilled from `product`).
-  useEffect(() => {
-    if (!open) return;
-    setForm(
-      product
-        ? {
-            ...product,
-            price: String(product.price),
-            stock: String(product.stock),
-          }
-        : EMPTY_FORM,
-    );
-  }, [open, product]);
-
-  const setField = (field) => (e) =>
-    setForm((prev) => ({ ...prev, [field]: e.target.value }));
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSave({
-      name: form.name.trim(),
-      category: form.category,
-      price: Number(form.price),
-      stock: Number(form.stock),
-      status: form.status,
-      icon: form.icon,
-    });
-  };
+  const form = useForm({
+    // Mounted only while open, so this runs afresh on every open — which is
+    // what the old reset effect was for.
+    initialValues: product
+      ? {
+          ...product,
+          price: String(product.price),
+          stock: String(product.stock),
+        }
+      : EMPTY_FORM,
+    validate,
+    onSubmit: (values) =>
+      onSave({
+        name: values.name.trim(),
+        category: values.category,
+        price: Number(values.price),
+        stock: Number(values.stock),
+        status: values.status,
+        icon: values.icon,
+      }),
+  });
 
   return (
     <Modal
@@ -91,69 +102,84 @@ export function ProductFormModal({ open, product, onClose, onSave }) {
           <Button
             type="submit"
             form="product-form"
+            loading={form.submitting}
             leftIcon={<IconCheck size={16} />}>
             {isEdit ? "Save changes" : "Add product"}
           </Button>
         </Stack>
       }>
-      <form id="product-form" onSubmit={handleSubmit}>
+      <form id="product-form" onSubmit={form.handleSubmit} noValidate>
         <Stack direction="column" spacing={12}>
-          <Input
-            label="Name"
-            placeholder="Product name"
-            value={form.name}
-            onChange={setField("name")}
-            required
-          />
+          <FormField error={form.errors.name}>
+            <Input
+              id="name"
+              name="name"
+              label="Name"
+              placeholder="Product name"
+              value={form.values.name}
+              onChange={form.handleChange("name")}
+              onBlur={form.handleBlur("name")}
+            />
+          </FormField>
+
           <Stack direction="row" spacing={12} wrap>
-            <div style={{ flex: "1 1 200px" }}>
+            <div className="field-grow">
               <Select
                 label="Category"
+                aria-label="Category"
                 options={FORM_CATEGORY_OPTIONS}
-                value={form.category}
-                onChange={setField("category")}
+                value={form.values.category}
+                onChange={form.handleChange("category")}
               />
             </div>
-            <div style={{ flex: "1 1 200px" }}>
+            <div className="field-grow">
               <Select
                 label="Icon"
+                aria-label="Icon"
                 options={ICON_OPTIONS}
-                value={form.icon}
-                onChange={setField("icon")}
+                value={form.values.icon}
+                onChange={form.handleChange("icon")}
               />
             </div>
           </Stack>
+
           <Stack direction="row" spacing={12} wrap>
-            <div style={{ flex: "1 1 200px" }}>
+            <FormField error={form.errors.price} className="field-grow">
               <Input
+                id="price"
+                name="price"
                 label="Price"
                 type="number"
                 min="0"
                 step="0.01"
                 placeholder="0.00"
-                value={form.price}
-                onChange={setField("price")}
-                required
+                value={form.values.price}
+                onChange={form.handleChange("price")}
+                onBlur={form.handleBlur("price")}
               />
-            </div>
-            <div style={{ flex: "1 1 200px" }}>
+            </FormField>
+            <FormField error={form.errors.stock} className="field-grow">
               <Input
+                id="stock"
+                name="stock"
                 label="Stock"
                 type="number"
                 min="0"
                 step="1"
                 placeholder="0"
-                value={form.stock}
-                onChange={setField("stock")}
-                required
+                value={form.values.stock}
+                onChange={form.handleChange("stock")}
+                onBlur={form.handleBlur("stock")}
               />
-            </div>
+            </FormField>
           </Stack>
+
           <Select
             label="Stock status"
+            aria-label="Stock status"
             options={STATUS_OPTIONS}
-            value={form.status}
-            onChange={setField("status")}
+            value={form.values.status}
+            onChange={form.handleChange("status")}
           />
         </Stack>
       </form>

@@ -1,17 +1,13 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   Badge,
   Button,
   Card,
-  EmptyState,
   Grid,
   GridItem,
   IconEye,
   IconPlus,
   IconShoppingCart,
-  Pagination,
-  SearchInput,
-  Select,
   Stack,
   Table,
   TableBody,
@@ -19,52 +15,58 @@ import {
   useToast,
 } from "naytak-react-ui";
 import { useDocumentTitle } from "../../hooks/useDocumentTitle";
+import { useListState } from "../../hooks/useListState";
+import { useCollection } from "../../app/dataContext";
 import { PageHeader } from "../../components/pageHeader";
+import { ListToolbar, SortableTh } from "../../components/listToolbar";
+import {
+  ListEmptyState,
+  ListPagination,
+  listTitle,
+} from "../../components/listResults";
 import { OrderDetailModal } from "./components/orderDetailModal";
+import { OrderFormModal } from "./components/orderFormModal";
 import { formatCurrency, formatDate, capitalize } from "../../utils/format";
-import { ORDERS, STATUS_COLORS, STATUS_OPTIONS } from "./data/mock";
+import { withNote } from "../../components/titleNote";
+import { STATUS_COLORS, STATUS_OPTIONS } from "./data/mock";
 
-const PAGE_SIZE = 8;
+/** Stable list config — useListState memoizes on these identities. */
+const SEARCH_KEYS = ["id", "customer", "email"];
+const FILTERS = { status: (order, value) => order.status === value };
 
 export function OrdersPage() {
   useDocumentTitle("Orders");
   const toast = useToast();
+  const orders = useCollection("orders");
 
-  const [query, setQuery] = useState("");
-  const [status, setStatus] = useState("all");
-  const [page, setPage] = useState(1);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [formOpen, setFormOpen] = useState(false);
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return ORDERS.filter((order) => {
-      const matchesQuery =
-        !q ||
-        order.id.toLowerCase().includes(q) ||
-        order.customer.toLowerCase().includes(q);
-      const matchesStatus = status === "all" || order.status === status;
-      return matchesQuery && matchesStatus;
-    });
-  }, [query, status]);
+  const list = useListState({
+    items: orders.items,
+    searchKeys: SEARCH_KEYS,
+    filters: FILTERS,
+    defaultSort: "date",
+    pageSize: 8,
+  });
 
-  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const currentPage = Math.min(page, pageCount);
-  const visibleOrders = filtered.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE,
-  );
+  const handleCreate = (data) => {
+    const created = orders.add(data);
+    list.revealItem(created);
+    setFormOpen(false);
+    toast.success(`Order ${created.id} created`);
+  };
 
   return (
     <Grid container fluid>
       <GridItem xs={12} spacing={2} className="mb-3">
         <PageHeader
-          title="Orders"
-          subtitle="Track and manage customer orders"
+          title={withNote("Orders", "Track and manage customer orders")}
           actions={
             <Button
               size="sm"
               leftIcon={<IconPlus size={16} />}
-              onClick={() => toast.info("New order form coming soon")}>
+              onClick={() => setFormOpen(true)}>
               New order
             </Button>
           }
@@ -72,42 +74,47 @@ export function OrdersPage() {
       </GridItem>
 
       <GridItem xs={12} spacing={2}>
-        <Card
-          title="All orders"
-          subtitle={`${filtered.length} order${filtered.length === 1 ? "" : "s"}`}>
-          <Stack direction="row" spacing={8} wrap className="mb-3 list-toolbar">
-            <SearchInput
-              placeholder="Search order ID or customer…"
-              clearable
-              value={query}
-              onChange={setQuery}
+        <Card title={listTitle("All orders", list)}>
+          <div className="mb-3">
+            <ListToolbar
+              list={list}
+              searchPlaceholder="Search order ID or customer…"
+              filters={[
+                { name: "status", label: "Status", options: STATUS_OPTIONS },
+              ]}
             />
-            <Select
-              value={status}
-              onChange={(e) => {
-                setStatus(e.target.value);
-                setPage(1);
-              }}
-              options={STATUS_OPTIONS}
-            />
-          </Stack>
+          </div>
 
-          {visibleOrders.length > 0 ? (
+          {list.visible.length > 0 ? (
             <div className="table-scroll">
               <Table>
                 <TableHead color="primary">
                   <tr>
-                    <th>Order</th>
-                    <th>Customer</th>
-                    <th>Date</th>
-                    <th>Items</th>
-                    <th>Total</th>
-                    <th>Status</th>
-                    <th style={{ textAlign: "right" }}>Actions</th>
+                    <SortableTh list={list} field="id">
+                      Order
+                    </SortableTh>
+                    <SortableTh list={list} field="customer">
+                      Customer
+                    </SortableTh>
+                    <SortableTh list={list} field="date">
+                      Date
+                    </SortableTh>
+                    <SortableTh list={list} field="items">
+                      Items
+                    </SortableTh>
+                    <SortableTh list={list} field="total">
+                      Total
+                    </SortableTh>
+                    <SortableTh list={list} field="status">
+                      Status
+                    </SortableTh>
+                    <th scope="col" style={{ textAlign: "right" }}>
+                      Actions
+                    </th>
                   </tr>
                 </TableHead>
                 <TableBody>
-                  {visibleOrders.map((order) => (
+                  {list.visible.map((order) => (
                     <tr key={order.id}>
                       <td>{order.id}</td>
                       <td>
@@ -140,22 +147,16 @@ export function OrdersPage() {
               </Table>
             </div>
           ) : (
-            <EmptyState
+            <ListEmptyState
+              list={list}
+              noun="order"
               icon={<IconShoppingCart size={28} />}
-              title="No orders found"
-              description="Try a different search term or status filter."
+              onCreate={() => setFormOpen(true)}
+              createLabel="New order"
             />
           )}
 
-          {pageCount > 1 && (
-            <div className="list-pagination">
-              <Pagination
-                currentPage={currentPage}
-                totalPages={pageCount}
-                onPageChange={setPage}
-              />
-            </div>
-          )}
+          <ListPagination list={list} noun="order" />
         </Card>
       </GridItem>
 
@@ -163,6 +164,14 @@ export function OrdersPage() {
         <OrderDetailModal
           order={selectedOrder}
           onClose={() => setSelectedOrder(null)}
+        />
+      )}
+
+      {formOpen && (
+        <OrderFormModal
+          open
+          onClose={() => setFormOpen(false)}
+          onSave={handleCreate}
         />
       )}
     </Grid>

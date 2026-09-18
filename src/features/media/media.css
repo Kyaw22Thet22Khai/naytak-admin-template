@@ -7,7 +7,7 @@
 .file-card__icon {
   align-items: center;
   background: var(--naytak-surface-2, rgba(0, 0, 0, 0.05));
-  border-radius: 0.6rem;
+  border-radius: var(--radius-md);
   color: var(--naytak-primary, #2563eb);
   display: flex;
   flex-shrink: 0;
@@ -21,7 +21,7 @@
 }
 
 .file-card__name {
-  font-size: 0.9375rem;
+  font-size: var(--text-md);
   font-weight: 600;
   margin: 0;
   overflow: hidden;
@@ -31,6 +31,12 @@
 
 .file-card__meta {
   color: var(--naytak-text-muted, #6b7280);
-  font-size: 0.8125rem;
-  margin-top: 2px;
+  font-size: var(--text-sm);
+  margin-top: var(--space-1);
+}
+
+/* Keeps long filenames from stretching the card. */
+.file-card__body {
+  flex: 1 1 auto;
+  min-width: 0;
 }

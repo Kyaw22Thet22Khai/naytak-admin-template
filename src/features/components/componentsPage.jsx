@@ -68,6 +68,7 @@ import {
 import { useDocumentTitle } from "../../hooks/useDocumentTitle";
 import { PageHeader } from "../../components/pageHeader";
 import "./components.css";
+import { withNote } from "../../components/titleNote";
 
 /** Live demo of the UI components available in naytak-react-ui. */
 export function ComponentsPage() {
@@ -92,8 +93,10 @@ export function ComponentsPage() {
     <Grid container fluid>
       <GridItem xs={12} spacing={2} className="mb-3">
         <PageHeader
-          title="Components"
-          subtitle="A live showcase of the naytak-react-ui components"
+          title={withNote(
+            "Components",
+            "A live showcase of the naytak-react-ui components",
+          )}
         />
       </GridItem>
 
@@ -101,7 +104,7 @@ export function ComponentsPage() {
       {/* Buttons */}
       {/* ---------------------------------------------------------------- */}
       <GridItem xs={12} spacing={2} className="mb-2">
-        <Card title="Buttons" subtitle="Variants, sizes and states">
+        <Card title={withNote("Buttons", "Variants, sizes and states")}>
           <Stack
             direction="row"
             spacing={8}
@@ -162,7 +165,7 @@ export function ComponentsPage() {
       </GridItem>
 
       <GridItem xs={12} spacing={2} className="mb-2">
-        <Card title="Button Group" subtitle="Grouped actions">
+        <Card title={withNote("Button Group", "Grouped actions")}>
           <Grid container>
             <GridItem xs={12} md={6} spacing={2}>
               <div className="components-label mb-1">Horizontal</div>
@@ -203,7 +206,7 @@ export function ComponentsPage() {
       {/* Badges */}
       {/* ---------------------------------------------------------------- */}
       <GridItem xs={12} spacing={2} className="mb-2">
-        <Card title="Badges" subtitle="Colors and variants">
+        <Card title={withNote("Badges", "Colors and variants")}>
           <Stack
             direction="row"
             spacing={8}
@@ -278,7 +281,7 @@ export function ComponentsPage() {
       {/* Tags */}
       {/* ---------------------------------------------------------------- */}
       <GridItem xs={12} spacing={2} className="mb-2">
-        <Card title="Tags" subtitle="Labels, filters and removable chips">
+        <Card title={withNote("Tags", "Labels, filters and removable chips")}>
           <Stack
             direction="row"
             spacing={8}
@@ -336,7 +339,7 @@ export function ComponentsPage() {
       {/* Alerts */}
       {/* ---------------------------------------------------------------- */}
       <GridItem xs={12} spacing={2} className="mb-2">
-        <Card title="Alerts" subtitle="Feedback messages">
+        <Card title={withNote("Alerts", "Feedback messages")}>
           <Grid container>
             <GridItem xs={12} md={6} spacing={2} className="mb-2">
               <Alert
@@ -375,7 +378,7 @@ export function ComponentsPage() {
       {/* Avatars */}
       {/* ---------------------------------------------------------------- */}
       <GridItem xs={12} spacing={2} className="mb-2">
-        <Card title="Avatars" subtitle="Sizes, colors and groups">
+        <Card title={withNote("Avatars", "Sizes, colors and groups")}>
           <Stack
             direction="row"
             spacing={16}
@@ -418,7 +421,8 @@ export function ComponentsPage() {
       {/* Status & Progress */}
       {/* ---------------------------------------------------------------- */}
       <GridItem xs={12} spacing={2} className="mb-2">
-        <Card title="Status & Progress" subtitle="Indicators and loading bars">
+        <Card
+          title={withNote("Status & Progress", "Indicators and loading bars")}>
           <Grid container>
             <GridItem xs={12} md={6} spacing={2}>
               <div className="components-label mb-2">Status Dot</div>
@@ -480,7 +484,8 @@ export function ComponentsPage() {
       {/* Feedback */}
       {/* ---------------------------------------------------------------- */}
       <GridItem xs={12} spacing={2} className="mb-2">
-        <Card title="Feedback" subtitle="Spinners, skeletons and empty states">
+        <Card
+          title={withNote("Feedback", "Spinners, skeletons and empty states")}>
           <Stack
             direction="row"
             spacing={18}
@@ -516,7 +521,7 @@ export function ComponentsPage() {
       {/* Form controls */}
       {/* ---------------------------------------------------------------- */}
       <GridItem xs={12} spacing={2} className="mb-2">
-        <Card title="Form Controls" subtitle="Inputs, selects and toggles">
+        <Card title={withNote("Form Controls", "Inputs, selects and toggles")}>
           <Grid container>
             <GridItem xs={12} md={6} spacing={2} className="mb-3">
               <Input label="Full name" placeholder="Alice Johnson" />
@@ -545,6 +550,7 @@ export function ComponentsPage() {
             <GridItem xs={12} md={6} spacing={2} className="mb-3">
               <Select
                 label="Country"
+                aria-label="Country"
                 options={[
                   { label: "United States", value: "us" },
                   { label: "Germany", value: "de" },
@@ -569,6 +575,7 @@ export function ComponentsPage() {
               />
               <Textarea
                 label="Message"
+                aria-label="Message"
                 placeholder="Write something…"
                 className="mt-2"
                 autoResize
@@ -630,8 +637,10 @@ export function ComponentsPage() {
       {/* ---------------------------------------------------------------- */}
       <GridItem xs={12} spacing={2} className="mb-2">
         <Card
-          title="Segmented Control & Tabs"
-          subtitle="Switch between options">
+          title={withNote(
+            "Segmented Control & Tabs",
+            "Switch between options",
+          )}>
           <Grid container>
             <GridItem xs={12} md={6} spacing={2}>
               <div className="components-label mb-2">Segmented Control</div>
@@ -693,16 +702,18 @@ export function ComponentsPage() {
       {/* ---------------------------------------------------------------- */}
       <GridItem xs={12} spacing={2} className="mb-2">
         <Card
-          title="Table & Pagination"
-          subtitle="Data tables with paging controls">
+          title={withNote(
+            "Table & Pagination",
+            "Data tables with paging controls",
+          )}>
           <div className="table-scroll">
             <Table>
               <TableHead>
                 <tr>
-                  <th>User</th>
-                  <th>Role</th>
-                  <th>Status</th>
-                  <th>Joined</th>
+                  <th scope="col">User</th>
+                  <th scope="col">Role</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Joined</th>
                 </tr>
               </TableHead>
               <TableBody>
@@ -748,8 +759,10 @@ export function ComponentsPage() {
 
       <GridItem xs={12} spacing={2} className="mb-2">
         <Card
-          title="Lists, Shortcuts, Dividers & Box"
-          subtitle="Content helpers">
+          title={withNote(
+            "Lists, Shortcuts, Dividers & Box",
+            "Content helpers",
+          )}>
           <Grid container>
             <GridItem xs={12} md={6} spacing={2}>
               <div className="components-label mb-2">Lists & Shortcuts</div>
@@ -804,8 +817,10 @@ export function ComponentsPage() {
       {/* ---------------------------------------------------------------- */}
       <GridItem xs={12} spacing={2} className="mb-2">
         <Card
-          title="Overlays & Interactivity"
-          subtitle="Modals, drawers, menus">
+          title={withNote(
+            "Overlays & Interactivity",
+            "Modals, drawers, menus",
+          )}>
           <Stack direction="row" spacing={8} wrap align="center">
             <Button size="sm" onClick={() => setModalOpen(true)}>
               Open Modal
@@ -881,7 +896,7 @@ export function ComponentsPage() {
       {/* Charts */}
       {/* ---------------------------------------------------------------- */}
       <GridItem xs={12} spacing={2} className="mb-2">
-        <Card title="Charts" subtitle="More chart types to explore">
+        <Card title={withNote("Charts", "More chart types to explore")}>
           <Grid container>
             <GridItem xs={12} md={6} spacing={2} className="mb-3">
               <BarChart

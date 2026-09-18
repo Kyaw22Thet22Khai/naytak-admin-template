@@ -25,6 +25,8 @@ export const ROUTES = {
   dashboard: "/dashboard",
   login: "/login",
   register: "/register",
+  forgotPassword: "/forgot-password",
+  profile: "/profile",
   analytics: "/analytics",
   customers: "/customers",
   orders: "/orders",
@@ -38,6 +40,24 @@ export const ROUTES = {
   users: "/users",
   settings: "/settings",
   components: "/components",
+};
+
+/**
+ * Paths people reasonably guess at, mapped to the real route.
+ *
+ * The landing page lives at "/" and has no name of its own, so "/landing" —
+ * the obvious guess, and the name of its feature folder — used to 404. These
+ * redirect rather than render a second copy, so each page keeps one canonical
+ * URL that is safe to share.
+ */
+export const ROUTE_ALIASES = {
+  "/landing": ROUTES.landing,
+  "/home": ROUTES.landing,
+  "/index": ROUTES.landing,
+  "/sign-in": ROUTES.login,
+  "/signin": ROUTES.login,
+  "/sign-up": ROUTES.register,
+  "/signup": ROUTES.register,
 };
 
 /**

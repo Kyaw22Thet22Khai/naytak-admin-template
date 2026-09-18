@@ -1,0 +1,134 @@
+/* ---------------------------------------------------------------------------
+   Design tokens.
+
+   naytak-react-ui ships a small set of theme variables (--naytak-primary, -bg,
+   -surface, -text, -border, -shadow-*) and flips them on the [data-naytak-theme]
+   wrapper. It does NOT ship semantic status colours or any spacing/type scale —
+   its badges and buttons hardcode their own hex values.
+
+   This file fills those gaps so the app has one source of truth:
+     · status colours that match the library's own values exactly, and that
+       actually change between light and dark instead of being frozen hex
+     · a type scale, a spacing scale and a radius scale, so sizes are chosen
+       from a set rather than invented per component
+
+   Everything here is defined on :root for light and re-declared under
+   [data-naytak-theme="dark"], which is the hook the library's ThemeProvider
+   sets on its wrapper element.
+   --------------------------------------------------------------------------- */
+
+:root {
+  /* -- Status colours ------------------------------------------------------
+     Base values are the library's own (.badge-success etc.) so a Badge and a
+     custom element that mean the same thing are the same colour. `-strong` is
+     the darker end of the library's gradient, for text on a tinted ground. */
+  --naytak-success: #22c55e;
+  --naytak-success-strong: #16a34a;
+  --naytak-danger: #ef4444;
+  --naytak-danger-strong: #dc2626;
+  --naytak-warning: #f59e0b;
+  --naytak-warning-strong: #d97706;
+  --naytak-info: #0ea5e9;
+  --naytak-info-strong: #0284c7;
+
+  /* Accents used for categorical tints (product categories, file types,
+     calendar events). Not status — these carry no good/bad meaning. */
+  --naytak-accent-violet: #8b5cf6;
+  --naytak-accent-teal: #14b8a6;
+  --naytak-accent-rose: #f43f5e;
+  --naytak-accent-amber: #f59e0b;
+
+  /* Ground for inverted surfaces (the undo bar), with its own foreground so
+     it never borrows --naytak-text and inverts itself in dark mode. */
+  --naytak-inverse-surface: #111827;
+  --naytak-inverse-text: #ffffff;
+
+  /* -- Type scale ----------------------------------------------------------
+     Seven steps, ~1.12 ratio at the small end widening toward the top. Every
+     font-size in the app comes from here. */
+  --text-xs: 0.75rem; /* 12px — meta, badges, table captions   */
+  --text-sm: 0.8125rem; /* 13px — secondary text, helper copy    */
+  --text-base: 0.875rem; /* 14px — body, table cells, form inputs */
+  --text-md: 1rem; /* 16px — card titles, emphasised body   */
+  --text-lg: 1.125rem; /* 18px — section headings               */
+  --text-xl: 1.375rem; /* 22px — stat values, page titles       */
+  --text-2xl: 1.75rem; /* 28px — hero numbers                   */
+
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  /* -- Spacing scale -------------------------------------------------------
+     Six steps on a 4px grid. Replaces the 20 ad-hoc values this project had
+     accumulated, so elements in different cards actually line up. */
+  --space-1: 0.25rem; /* 4px  */
+  --space-2: 0.5rem; /* 8px  */
+  --space-3: 0.75rem; /* 12px */
+  --space-4: 1rem; /* 16px */
+  --space-5: 1.5rem; /* 24px */
+  --space-6: 2rem; /* 32px */
+  --space-7: 2.5rem; /* 40px - gaps between page sections */
+  --space-8: 4rem; /* 64px - landing-page section rhythm  */
+
+  /* -- Controls ------------------------------------------------------------
+     One height for every control that sits on a toolbar row. The library
+     gives inputs, selects and buttons each their own sizing — a <select> has
+     no explicit height at all and falls back to its intrinsic line-height —
+     so a row of them ends up visibly uneven. */
+  --control-height: 2.5rem; /* 40px */
+
+  /* -- Radius scale -------------------------------------------------------- */
+  --radius-sm: 0.375rem; /* 6px  — inputs, small chips        */
+  --radius-md: 0.625rem; /* 10px — cards, tiles, panels       */
+  --radius-lg: 1rem; /* 16px — hero panels, modals        */
+  --radius-pill: 9999px;
+
+  /* -- Elevation -----------------------------------------------------------
+     Aliases onto the library's tokens, which already carry dark-mode
+     variants, so custom CSS stops hardcoding slate rgba shadows. */
+  --elevation-1: var(--naytak-shadow-card, 0 1px 2px rgb(15 23 42 / 6%));
+  --elevation-2: var(--naytak-shadow-lg, 0 16px 40px rgb(30 41 59 / 18%));
+  --elevation-overlay: 0 12px 32px -12px rgb(15 23 42 / 45%);
+
+  /* -- Focus ring ----------------------------------------------------------
+     One definition, used by every :focus-visible rule in the app. */
+  --focus-ring-color: var(--naytak-primary, #2563eb);
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+
+  /* -- Motion -------------------------------------------------------------- */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.25s ease;
+}
+
+/* Dark theme. The library sets data-naytak-theme on <html> — the same element
+   :root matches — so the selector is qualified to outrank the block above
+   regardless of source order.
+
+   Status hues are lifted here: the light-mode values are mixed for white
+   backgrounds and read as muddy on a #0b1220 ground. */
+:root[data-naytak-theme="dark"] {
+  --naytak-success: #4ade80;
+  --naytak-success-strong: #22c55e;
+  --naytak-danger: #f87171;
+  --naytak-danger-strong: #ef4444;
+  --naytak-warning: #fbbf24;
+  --naytak-warning-strong: #f59e0b;
+  --naytak-info: #38bdf8;
+  --naytak-info-strong: #0ea5e9;
+
+  --naytak-accent-violet: #a78bfa;
+  --naytak-accent-teal: #2dd4bf;
+  --naytak-accent-rose: #fb7185;
+  --naytak-accent-amber: #fbbf24;
+
+  /* Inverted surfaces flip with the theme: a light bar on a dark page. */
+  --naytak-inverse-surface: #e5e9f0;
+  --naytak-inverse-text: #0b1220;
+
+  --elevation-overlay: 0 12px 32px -12px rgb(0 0 0 / 65%);
+}

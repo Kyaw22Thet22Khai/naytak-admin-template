@@ -1,4 +1,7 @@
-/* Global base styles for the admin panel. */
+/* Global base styles for the admin panel.
+   Design tokens (colour, type, spacing, radius, elevation) live in
+   styles/tokens.css and must load first — everything below consumes them. */
+@import "./styles/tokens.css";
 
 * {
   box-sizing: border-box;
@@ -21,13 +24,8 @@ code {
 /* PageHeader shared styles */
 .page-header__title {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: var(--text-xl);
   font-weight: 600;
-}
-
-.page-header__subtitle {
-  margin: 4px 0 0;
-  opacity: 0.7;
 }
 
 /* ---------------------------------------------------------------------------
@@ -38,7 +36,7 @@ code {
   align-items: center;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--space-4);
   justify-content: center;
   min-height: 320px;
 }
@@ -60,30 +58,33 @@ code {
 }
 
 .naytak-loader__logo {
-  border-radius: 14px;
-  box-shadow: 0 10px 24px -8px var(--naytak-primary, #2563eb);
+  border-radius: var(--radius-lg);
+  box-shadow: var(
+    --naytak-primary-glow,
+    0 10px 24px -8px var(--naytak-primary)
+  );
   height: 46px;
   width: 46px;
 }
 
 .naytak-loader__label {
   color: var(--naytak-text-muted, #6b7280);
-  font-size: 0.875rem;
+  font-size: var(--text-base);
   font-weight: 600;
   letter-spacing: 0.03em;
 }
 
 .naytak-loader__dots {
   display: inline-flex;
-  margin-left: 6px;
+  margin-left: var(--space-2);
   vertical-align: middle;
 }
 
 .naytak-loader__dots span {
   background: var(--naytak-primary, #2563eb);
-  border-radius: 9999px;
+  border-radius: var(--radius-pill);
   height: 5px;
-  margin: 0 2px;
+  margin: 0 var(--space-1);
   opacity: 0.35;
   width: 5px;
 }
@@ -93,30 +94,30 @@ code {
   margin-bottom: 0;
 }
 .mb-1 {
-  margin-bottom: 0.25rem;
+  margin-bottom: var(--space-1);
 }
 .mb-2 {
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--space-2);
 }
 .mb-3 {
-  margin-bottom: 1rem;
+  margin-bottom: var(--space-4);
 }
 .mb-4 {
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--space-5);
 }
 
 /* Margin-top utilities */
 .mt-1 {
-  margin-top: 0.25rem;
+  margin-top: var(--space-1);
 }
 .mt-2 {
-  margin-top: 0.5rem;
+  margin-top: var(--space-2);
 }
 .mt-3 {
-  margin-top: 1rem;
+  margin-top: var(--space-4);
 }
 .mt-4 {
-  margin-top: 1.5rem;
+  margin-top: var(--space-5);
 }
 
 /* Height utilities */
@@ -124,148 +125,36 @@ code {
   height: 100%;
 }
 
-/* Table scroll wrapper — keeps the table full-width (table layout) with
-   horizontal scroll only when content overflows on small screens */
+/* ---------------------------------------------------------------------------
+   Table scroll wrapper — full-width table, horizontal scroll only when the
+   content overflows.
+
+   The edge shadows are the classic CSS-only scroll hint: the two "cover"
+   gradients are `local`, so they travel with the content, while the two
+   shadow gradients are `scroll`, so they stay pinned to the edges. The result
+   is a shadow that appears only when there is more table in that direction
+   and fades out at either end — no JS, no scroll listener.
+
+   Without it, a table running off the side of a phone just looks cut off.
+   --------------------------------------------------------------------------- */
 .table-scroll {
   overflow-x: auto;
+  background:
+    linear-gradient(to right, var(--naytak-surface, #fff) 30%, transparent) left
+      center / var(--space-6) 100% no-repeat local,
+    linear-gradient(to left, var(--naytak-surface, #fff) 30%, transparent) right
+      center / var(--space-6) 100% no-repeat local,
+    linear-gradient(to right, rgb(15 23 42 / 18%), transparent) left center /
+      var(--space-2) 100% no-repeat scroll,
+    linear-gradient(to left, rgb(15 23 42 / 18%), transparent) right center /
+      var(--space-2) 100% no-repeat scroll;
 }
 
-/* List-page shared styles (Users, Orders, …) */
-.list-meta {
-  color: var(--naytak-text-muted, #6b7280);
-  font-size: 0.75rem;
-  line-height: 1.3;
-}
-
-.list-toolbar {
-  align-items: flex-end;
-}
-
-/* Keep search + filter controls on a single row: the search takes a fixed
-   width instead of stretching to fill the row, and the selects shrink to
-   their content so they sit beside it. They still wrap gracefully on narrow
-   screens because the toolbar Stack uses flex-wrap. */
-.list-toolbar .search-input {
-  flex: 0 1 300px;
-}
-
-.list-toolbar .field {
-  flex: 0 0 auto;
-}
-
-/* Make the search field and the filter Selects the exact same height (40px)
-   and vertically center their text so the toolbar row lines up on every list
-   page. Horizontal padding is untouched (the search needs room for its icon
-   and clear button). */
-.list-toolbar .search-input-field,
-.list-toolbar .select {
-  height: 40px;
-  padding-bottom: 0;
-  padding-top: 0;
-}
-
-.list-pagination {
-  display: flex;
-  justify-content: flex-end;
-  padding-top: 12px;
-}
-
-/* Modals must sit above the fixed dashboard footer (z-index: 100) and navbar
-   (z-index: 99). The library's .modal root uses isolation:isolate (z-auto) so
-   it paints below the footer, making modal footer buttons unclickable. */
-.modal {
-  inset: 0;
-  position: fixed;
-  z-index: 1100;
-}
-
-/* Form inputs should stretch to full field width. The library's .field uses
-   align-items:flex-start, which shrinks .field-control to its content width
-   (only the Select stays full width via its own width:100%). */
-.field-control {
-  width: 100%;
-}
-
-/* Confirm (delete) modal — centered warning icon, title, message and actions */
-.confirm-modal {
-  padding: 8px 0 4px;
-  text-align: center;
-}
-
-.confirm-modal__icon {
-  align-items: center;
-  background: rgba(239, 68, 68, 0.12);
-  border-radius: 9999px;
-  color: var(--naytak-danger, #ef4444);
-  display: inline-flex;
-  height: 56px;
-  justify-content: center;
-  margin-bottom: 14px;
-  width: 56px;
-}
-
-.confirm-modal__title {
-  font-size: 1.125rem;
-  font-weight: 700;
-  margin: 0 0 6px;
-}
-
-.confirm-modal__message {
-  color: var(--naytak-text-muted, #6b7280);
-  font-size: 0.9rem;
-  line-height: 1.5;
-  margin: 0 auto 22px;
-  max-width: 300px;
-}
-
-.confirm-modal__actions {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-}
-
-.confirm-modal__actions .btn {
-  flex: 1;
-  min-width: 120px;
-}
-
-/* ---------------------------------------------------------------------------
-   UI polish — theme-aware global refinements
-   --------------------------------------------------------------------------- */
-
-/* Theme-aware page background so light/dark switching feels seamless (no white
-   flash) and the base text color is consistent. */
-body {
-  background-color: var(--naytak-bg, #f6f8fb);
-  color: var(--naytak-text, #111827);
-  transition:
-    background-color 0.25s ease,
-    color 0.25s ease;
-}
-
-::selection {
-  background: var(--naytak-primary-soft, rgba(37, 99, 235, 0.2));
-}
-
-/* Slim, unobtrusive scrollbars */
-* {
-  scrollbar-color: var(--naytak-border-strong, #d1d5db) transparent;
-  scrollbar-width: thin;
-}
-
-/* Consistent keyboard-focus ring (kept low specificity so component styles
-   that already define a focus ring win). */
-:where(
-  a,
-  button,
-  [role="button"],
-  input,
-  select,
-  textarea,
-  [tabindex]
-):focus-visible {
-  outline: 2px solid var(--naytak-primary, #2563eb);
-  outline-offset: 2px;
+/* Zebra striping — makes it much easier to track one value across a wide row.
+   Tinted from the text colour so it follows both colour modes instead of
+   being a fixed grey that disappears on a dark surface. */
+.table tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--naytak-text, #111827) 3%, transparent);
 }
 
 /* Subtle hover highlight on table body rows (theme-aware). */
@@ -301,18 +190,18 @@ body {
 .widget-card .card-body {
   align-items: flex-start;
   display: flex;
-  gap: 14px;
+  gap: var(--space-4);
   width: 100%;
 }
 
 .widget-card__icon {
   align-items: center;
-  border-radius: 0.75rem;
+  border-radius: var(--radius-md);
   display: flex;
   flex-shrink: 0;
   height: 48px;
   justify-content: center;
-  margin-top: 2px;
+  margin-top: var(--space-1);
   width: 48px;
 }
 
@@ -323,28 +212,28 @@ body {
 
 .widget-card__label {
   color: var(--naytak-text-muted, #6b7280);
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
 .widget-card__value {
-  font-size: 1.6rem;
+  font-size: var(--text-xl);
   font-weight: 700;
   line-height: 1.25;
-  margin: 2px 0 4px;
+  margin: var(--space-1) 0 var(--space-1);
 }
 
 .widget-card__trend {
-  font-size: 0.8125rem;
+  font-size: var(--text-sm);
   font-weight: 600;
 }
 
 .widget-card__trend span {
   color: var(--naytak-text-muted, #6b7280);
   font-weight: 400;
-  margin-left: 4px;
+  margin-left: var(--space-1);
 }
 
 /* Detail rows inside the detail modals — emphasize the closing (total) value. */
@@ -358,12 +247,182 @@ body {
 /* ---------------------------------------------------------------------------
    Mobile refinements (≤599px) for shared list-page helpers and PageHeader
    --------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------
+   Sortable table headers — a real button so the column is keyboard-reachable,
+   styled to look like the plain header text it replaces.
+   --------------------------------------------------------------------------- */
+.sort-th {
+  align-items: center;
+  background: none;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  gap: var(--space-1);
+  padding: 0;
+  white-space: nowrap;
+}
+
+.sort-th svg {
+  opacity: 0.45;
+  transition: opacity 0.15s ease;
+}
+
+.sort-th:hover svg,
+.sort-th--active svg {
+  opacity: 1;
+}
+
+.sort-th:focus-visible {
+  border-radius: var(--radius-sm);
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* ---------------------------------------------------------------------------
+   Undo bar — a short window to reverse a delete, which a confirm dialog alone
+   cannot give you.
+   --------------------------------------------------------------------------- */
+.undo-bar {
+  align-items: center;
+  /* Its own inverted pair, not --naytak-text: borrowing the text colour made
+     the bar near-white with white text once the dark theme flipped it. */
+  background: var(--naytak-inverse-surface);
+  border-radius: var(--radius-md);
+  bottom: max(var(--space-4), env(safe-area-inset-bottom, 0px));
+  box-shadow: var(--elevation-overlay);
+  color: var(--naytak-inverse-text);
+  display: flex;
+  gap: var(--space-2);
+  left: 50%;
+  max-width: calc(100vw - var(--space-6));
+  padding: var(--space-2) var(--space-3) var(--space-2) var(--space-4);
+  position: fixed;
+  transform: translateX(-50%);
+  z-index: 1200;
+}
+
+.undo-bar__message {
+  font-size: var(--text-base);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The bar paints an inverted ground in both themes, so its buttons follow the
+   inverted foreground rather than the page text colour. */
+.undo-bar__action.btn {
+  color: var(--naytak-inverse-text);
+}
+
+.undo-bar__action.btn:hover {
+  background: color-mix(in srgb, var(--naytak-inverse-text) 14%, transparent);
+}
+
+.undo-bar__action.btn:focus-visible {
+  outline: var(--focus-ring-width) solid var(--naytak-inverse-text);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* ---------------------------------------------------------------------------
+   Form validation — FormField renders the message; these style it and tint
+   the control it wraps. naytak-react-ui inputs have no error state of their
+   own, so the border colour is applied from here.
+   --------------------------------------------------------------------------- */
+.form-field {
+  min-width: 0;
+}
+
+.form-field__error {
+  color: var(--naytak-danger);
+  font-size: var(--text-sm);
+  line-height: 1.35;
+  margin: var(--space-1) 0 0;
+}
+
+.form-field--invalid .form-control,
+.form-field--invalid .select,
+.form-field--invalid textarea,
+.form-field--invalid .password-input-field {
+  border-color: var(--naytak-danger);
+}
+
+.form-field--invalid .form-control:focus,
+.form-field--invalid .select:focus,
+.form-field--invalid textarea:focus {
+  box-shadow: 0 0 0 3px
+    color-mix(in srgb, var(--naytak-danger) 22%, transparent);
+  outline: none;
+}
+
+/* Lets two fields share a row and still wrap on narrow screens. */
+.field-grow {
+  flex: 1 1 260px;
+}
+
+/* ---------------------------------------------------------------------------
+   Skip link — visible only while focused, so keyboard users can jump past the
+   sidebar and navbar straight to page content.
+   --------------------------------------------------------------------------- */
+.skip-link {
+  background: var(--naytak-primary, #2563eb);
+  border-radius: 0 0 6px 0;
+  color: #fff;
+  font-size: var(--text-base);
+  left: 0;
+  padding: var(--space-3) var(--space-4);
+  position: absolute;
+  text-decoration: none;
+  top: 0;
+  transform: translateY(-120%);
+  transition: transform 0.15s ease;
+  z-index: 1100;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+#main-content:focus {
+  outline: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Error and not-found states.
+   --------------------------------------------------------------------------- */
+.error-fallback {
+  padding: var(--space-6) var(--space-4);
+}
+
+.route-error {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  padding: var(--space-6) var(--space-4);
+}
+
+/* ---------------------------------------------------------------------------
+   Respect a reduced-motion preference across every animation in the app.
+   --------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 @media (max-width: 599px) {
   /* Stack the page title and its action buttons vertically on phones. */
   .page-header {
     align-items: flex-start;
     flex-direction: column;
-    gap: 12px;
+    gap: var(--space-3);
   }
 
   /* Let the search field take a full row on its own; filters wrap below. */
@@ -374,13 +433,230 @@ body {
   /* Center and wrap pagination controls on small screens. */
   .list-pagination {
     flex-wrap: wrap;
-    gap: 6px;
+    gap: var(--space-2);
     justify-content: center;
   }
 
   /* Slightly tighter table cells on phones (kept inside .table-scroll). */
   .table th,
   .table td {
-    padding: 0.6rem 0.75rem;
+    padding: var(--space-3) var(--space-3);
   }
+}
+
+/* ---------------------------------------------------------------------------
+   Visually hidden text — announced by screen readers, invisible on screen.
+   --------------------------------------------------------------------------- */
+.sr-only {
+  border: 0;
+  clip-path: inset(50%);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+/* Message rows are a semantic list; strip the default list chrome. */
+.message-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Dashboard widgets that drill through to a section. */
+.widget-card__link {
+  color: inherit;
+  display: block;
+  height: 100%;
+  text-decoration: none;
+}
+
+.widget-card__link:focus-visible {
+  border-radius: var(--radius-md);
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* ---------------------------------------------------------------------------
+   Skeleton placeholders — shown while a lazily loaded page arrives, and ready
+   for the moment the data layer gains a real loading state.
+   --------------------------------------------------------------------------- */
+.skeleton-table__row {
+  align-items: center;
+  border-bottom: 1px solid var(--naytak-border, #e5e7eb);
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: 1.6fr repeat(4, 1fr);
+  padding: var(--space-3) var(--space-2);
+}
+
+.skeleton-table__row--head {
+  border-bottom-color: var(--naytak-border-strong, #d1d5db);
+}
+
+.skeleton-table__row:last-child {
+  border-bottom: none;
+}
+
+@media (max-width: 767px) {
+  /* Fewer columns on a phone: five skeleton bars in a 320px row read as noise. */
+  .skeleton-table__row {
+    grid-template-columns: 1.6fr 1fr 1fr;
+  }
+
+  .skeleton-table__row > :nth-child(n + 4) {
+    display: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Section heading — groups a band of panels within a page.
+   --------------------------------------------------------------------------- */
+.section-heading {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  justify-content: space-between;
+  margin: var(--space-5) 0 var(--space-3);
+}
+
+.section-heading:first-child {
+  margin-top: 0;
+}
+
+.section-heading__title {
+  color: var(--naytak-text, #111827);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.08em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+/* ---------------------------------------------------------------------------
+   Primary stat — the one number the page is really about. Slightly larger and
+   tinted, so a row of four cards has a focal point instead of reading as four
+   equal tiles.
+   --------------------------------------------------------------------------- */
+.widget-card--primary {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--widget-accent, #2563eb) 7%, transparent) 0%,
+    transparent 60%
+  );
+}
+
+.widget-card--primary .widget-card__value {
+  font-size: var(--text-2xl);
+}
+
+/* ---------------------------------------------------------------------------
+   List toolbar — a real <form>, so Enter in the search box submits it and the
+   Search button is the one place filtering is applied.
+   --------------------------------------------------------------------------- */
+.list-toolbar {
+  margin: 0;
+}
+
+/* Lets the search field grow while the selects keep their natural width. */
+.list-toolbar .search-input {
+  flex: 1 1 220px;
+  min-width: 180px;
+}
+
+/* One height for the whole row.
+
+   Left alone, the three controls disagree: .search-input-field and .select
+   both use 0.5rem vertical padding but a <select> adds its own intrinsic
+   line-height on top, and .btn-sm is pinned to min-height: 2rem. The result
+   was selects standing slightly taller than the input and button. Pinning the
+   same box height to all three settles it in every browser. */
+.list-toolbar .search-input-field,
+.list-toolbar .select,
+.list-toolbar .btn {
+  font-size: var(--text-base);
+  height: var(--control-height);
+  min-height: var(--control-height);
+}
+
+/* The select keeps room for its own chevron; without an explicit line-height
+   its text drifts off-centre once the height is fixed. */
+.list-toolbar .select {
+  line-height: var(--leading-tight);
+}
+
+/* Says the form is holding changes the results do not reflect yet. */
+.list-toolbar__hint {
+  align-items: center;
+  color: var(--naytak-warning-strong);
+  display: inline-flex;
+  font-size: var(--text-sm);
+  gap: var(--space-1);
+}
+
+.list-toolbar__hint::before {
+  background: currentColor;
+  border-radius: var(--radius-pill);
+  content: "";
+  height: 6px;
+  width: 6px;
+}
+
+@media (max-width: 599px) {
+  /* The Search button gets its own full-width row rather than being squeezed
+     onto the end of the wrapped filters. */
+  .list-toolbar .btn[type="submit"] {
+    flex: 1 1 100%;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Chart cards — keep a row of charts visually level.
+
+   The chart components size themselves from their own viewBox, so two cards
+   side by side end up whatever height their content dictates. Giving the card
+   body a shared minimum and centring the chart inside it means a donut and a
+   bar chart sit level instead of one card running short.
+   --------------------------------------------------------------------------- */
+.chart-card .card-body {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  min-height: 320px;
+}
+
+.chart-card .chart {
+  max-width: 100%;
+  width: 100%;
+}
+
+/* Square charts (gauge, donut) stretch to their container because their SVG
+   is width:100%. In a half-width card that makes them enormous, so they are
+   capped and centred instead. */
+.chart-card__square {
+  margin: 0 auto;
+  max-width: 260px;
+  text-align: center;
+  width: 100%;
+}
+
+/* ---------------------------------------------------------------------------
+   Inline title note — the description that follows a heading on the same line.
+
+   Three things separate it from the title, because colour alone is not enough
+   next to a bold 1.5rem heading: it is muted, it drops back to regular weight,
+   and it steps down in size. The size is in `em` so one rule reads correctly
+   in a page header, a card title and a section heading alike.
+   --------------------------------------------------------------------------- */
+.title-note {
+  color: var(--naytak-text-muted, #6b7280);
+  font-size: 0.8em;
+  font-weight: var(--weight-regular);
+  letter-spacing: 0;
+  /* Uppercase section headings should not shout their description too. */
+  text-transform: none;
 }

@@ -1,0 +1,20 @@
+.profile-identity {
+  text-align: center;
+}
+
+.profile-identity__name {
+  font-weight: 600;
+  color: var(--naytak-text, #0f172a);
+}
+
+.profile-identity__email {
+  font-size: var(--text-base);
+  color: var(--naytak-text-muted, #6b7280);
+}
+
+.profile-section-title {
+  margin: 0;
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: var(--naytak-text, #0f172a);
+}

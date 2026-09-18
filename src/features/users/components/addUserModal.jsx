@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import {
   Button,
   IconCheck,
@@ -7,9 +6,21 @@ import {
   Select,
   Stack,
 } from "naytak-react-ui";
+import { FormField } from "../../../components/formField";
+import {
+  useForm,
+  buildValidator,
+  required,
+  email,
+} from "../../../hooks/useForm";
 import { ADD_USER_ROLE_OPTIONS } from "../data/mock";
 
 const EMPTY_FORM = { name: "", email: "", role: "viewer" };
+
+const validate = buildValidator({
+  name: [required("Full name")],
+  email: [required("Email"), email],
+});
 
 /**
  * Modal form used to create or edit a user.
@@ -18,28 +29,21 @@ const EMPTY_FORM = { name: "", email: "", role: "viewer" };
  */
 export function AddUserModal({ open, user, onClose, onSave }) {
   const isEdit = Boolean(user);
-  const [form, setForm] = useState(EMPTY_FORM);
 
-  // Reset the form whenever the modal opens (fresh or prefilled from `user`).
-  useEffect(() => {
-    if (!open) return;
-    setForm(
-      user
-        ? { name: user.name, email: user.email, role: user.role }
-        : EMPTY_FORM,
-    );
-  }, [open, user]);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSave({
-      ...form,
-      status: user ? user.status : "active",
-    });
-  };
-
-  const setField = (field) => (e) =>
-    setForm((prev) => ({ ...prev, [field]: e.target.value }));
+  const form = useForm({
+    // Mounted only while open, so this runs afresh on every open.
+    initialValues: user
+      ? { name: user.name, email: user.email, role: user.role }
+      : EMPTY_FORM,
+    validate,
+    onSubmit: (values) =>
+      onSave({
+        name: values.name.trim(),
+        email: values.email.trim().toLowerCase(),
+        role: values.role,
+        status: user ? user.status : "active",
+      }),
+  });
 
   return (
     <Modal
@@ -55,33 +59,43 @@ export function AddUserModal({ open, user, onClose, onSave }) {
             type="submit"
             form="add-user-form"
             outlined
+            loading={form.submitting}
             leftIcon={<IconCheck size={16} />}>
             {isEdit ? "Save changes" : "Save user"}
           </Button>
         </Stack>
       }>
-      <form id="add-user-form" onSubmit={handleSubmit}>
+      <form id="add-user-form" onSubmit={form.handleSubmit} noValidate>
         <Stack direction="column" spacing={12}>
-          <Input
-            label="Full name"
-            placeholder="Jane Doe"
-            value={form.name}
-            onChange={setField("name")}
-            required
-          />
-          <Input
-            label="Email"
-            type="email"
-            placeholder="jane@naytak.io"
-            value={form.email}
-            onChange={setField("email")}
-            required
-          />
+          <FormField error={form.errors.name}>
+            <Input
+              id="name"
+              name="name"
+              label="Full name"
+              placeholder="Jane Doe"
+              value={form.values.name}
+              onChange={form.handleChange("name")}
+              onBlur={form.handleBlur("name")}
+            />
+          </FormField>
+          <FormField error={form.errors.email}>
+            <Input
+              id="email"
+              name="email"
+              label="Email"
+              type="email"
+              placeholder="jane@naytak.io"
+              value={form.values.email}
+              onChange={form.handleChange("email")}
+              onBlur={form.handleBlur("email")}
+            />
+          </FormField>
           <Select
             label="Role"
+            aria-label="Role"
             options={ADD_USER_ROLE_OPTIONS}
-            value={form.role}
-            onChange={setField("role")}
+            value={form.values.role}
+            onChange={form.handleChange("role")}
           />
         </Stack>
       </form>

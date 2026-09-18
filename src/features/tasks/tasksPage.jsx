@@ -1,19 +1,15 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   Avatar,
   Badge,
   Button,
   Card,
-  EmptyState,
   Grid,
   GridItem,
   IconCheck,
   IconClipboardList,
   IconEdit,
   IconPlus,
-  Pagination,
-  SearchInput,
-  Select,
   Stack,
   Table,
   TableBody,
@@ -21,61 +17,57 @@ import {
   useToast,
 } from "naytak-react-ui";
 import { useDocumentTitle } from "../../hooks/useDocumentTitle";
+import { useListState } from "../../hooks/useListState";
+import { useCollection } from "../../app/dataContext";
 import { PageHeader } from "../../components/pageHeader";
 import { ConfirmButton } from "../../components/confirmButton";
+import { ListToolbar, SortableTh } from "../../components/listToolbar";
+import {
+  ListEmptyState,
+  ListPagination,
+  listTitle,
+} from "../../components/listResults";
+import { UndoBar, useUndoable } from "../../components/undoBar";
 import { TaskFormModal } from "./components/taskFormModal";
 import { capitalize, formatDate } from "../../utils/format";
+import { withNote } from "../../components/titleNote";
 import {
   PRIORITY_COLORS,
   PRIORITY_OPTIONS,
   STATUS_COLORS,
   STATUS_LABELS,
   STATUS_OPTIONS,
-  TASKS,
 } from "./data/mock";
 
-const PAGE_SIZE = 8;
+/** Stable list config — useListState memoizes on these identities. */
+const SEARCH_KEYS = ["title", "assignee"];
+const FILTERS = {
+  priority: (task, value) => task.priority === value,
+  status: (task, value) => task.status === value,
+};
 
 export function TasksPage() {
   useDocumentTitle("Tasks");
   const toast = useToast();
 
-  const [tasks, setTasks] = useState(TASKS);
-  const [query, setQuery] = useState("");
-  const [priority, setPriority] = useState("all");
-  const [status, setStatus] = useState("all");
-  const [page, setPage] = useState(1);
+  const tasks = useCollection("tasks");
+  const undo = useUndoable();
+
   const [formOpen, setFormOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return tasks.filter((task) => {
-      const matchesQuery =
-        !q ||
-        task.title.toLowerCase().includes(q) ||
-        task.assignee.toLowerCase().includes(q);
-      const matchesPriority = priority === "all" || task.priority === priority;
-      const matchesStatus = status === "all" || task.status === status;
-      return matchesQuery && matchesPriority && matchesStatus;
-    });
-  }, [tasks, query, priority, status]);
+  const list = useListState({
+    items: tasks.items,
+    searchKeys: SEARCH_KEYS,
+    filters: FILTERS,
+    defaultSort: "due",
+    pageSize: 8,
+  });
 
-  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const currentPage = Math.min(page, pageCount);
-  const visibleTasks = filtered.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE,
-  );
-
-  const toggleDone = (id) => {
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === id
-          ? { ...task, status: task.status === "done" ? "todo" : "done" }
-          : task,
-      ),
-    );
+  const toggleDone = (task) => {
+    const done = task.status === "done";
+    tasks.update(task.id, { status: done ? "todo" : "done" });
+    toast.success(done ? "Task reopened" : "Task completed");
   };
 
   const openForm = (task) => {
@@ -84,34 +76,31 @@ export function TasksPage() {
   };
 
   const handleSave = (data) => {
+    let saved;
     if (editingTask) {
-      setTasks((prev) =>
-        prev.map((task) =>
-          task.id === editingTask.id ? { ...task, ...data } : task,
-        ),
-      );
+      tasks.update(editingTask.id, data);
+      saved = { ...editingTask, ...data };
       toast.success("Task updated");
     } else {
-      setTasks((prev) => [{ ...data, id: Date.now() }, ...prev]);
+      saved = tasks.add(data);
       toast.success("Task created");
     }
-    setPriority("all");
-    setStatus("all");
-    setPage(1);
+    list.revealItem(saved);
     setFormOpen(false);
+    setEditingTask(null);
   };
 
-  const handleDelete = (id) => {
-    setTasks((prev) => prev.filter((task) => task.id !== id));
-    toast.success("Task deleted");
+  const handleDelete = (task) => {
+    const index = tasks.items.findIndex((item) => item.id === task.id);
+    tasks.remove(task.id);
+    undo.offer(`“${task.title}” deleted`, () => tasks.restore(task, index));
   };
 
   return (
     <Grid container fluid>
       <GridItem xs={12} spacing={2} className="mb-3">
         <PageHeader
-          title="Tasks"
-          subtitle="Track and manage your team's work"
+          title={withNote("Tasks", "Track and manage your team's work")}
           actions={
             <Button
               size="sm"
@@ -124,49 +113,49 @@ export function TasksPage() {
       </GridItem>
 
       <GridItem xs={12} spacing={2}>
-        <Card
-          title="All tasks"
-          subtitle={`${filtered.length} task${filtered.length === 1 ? "" : "s"}`}>
-          <Stack direction="row" spacing={8} wrap className="mb-3 list-toolbar">
-            <SearchInput
-              placeholder="Search task or assignee…"
-              clearable
-              value={query}
-              onChange={setQuery}
+        <Card title={listTitle("All tasks", list)}>
+          <div className="mb-3">
+            <ListToolbar
+              list={list}
+              searchPlaceholder="Search task or assignee…"
+              filters={[
+                {
+                  name: "priority",
+                  label: "Priority",
+                  options: PRIORITY_OPTIONS,
+                },
+                { name: "status", label: "Status", options: STATUS_OPTIONS },
+              ]}
             />
-            <Select
-              value={priority}
-              onChange={(e) => {
-                setPriority(e.target.value);
-                setPage(1);
-              }}
-              options={PRIORITY_OPTIONS}
-            />
-            <Select
-              value={status}
-              onChange={(e) => {
-                setStatus(e.target.value);
-                setPage(1);
-              }}
-              options={STATUS_OPTIONS}
-            />
-          </Stack>
+          </div>
 
-          {visibleTasks.length > 0 ? (
+          {list.visible.length > 0 ? (
             <div className="table-scroll">
               <Table>
                 <TableHead color="primary">
                   <tr>
-                    <th>Task</th>
-                    <th>Assignee</th>
-                    <th>Priority</th>
-                    <th>Due</th>
-                    <th>Status</th>
-                    <th style={{ textAlign: "right" }}>Actions</th>
+                    <SortableTh list={list} field="title">
+                      Task
+                    </SortableTh>
+                    <SortableTh list={list} field="assignee">
+                      Assignee
+                    </SortableTh>
+                    <SortableTh list={list} field="priority">
+                      Priority
+                    </SortableTh>
+                    <SortableTh list={list} field="due">
+                      Due
+                    </SortableTh>
+                    <SortableTh list={list} field="status">
+                      Status
+                    </SortableTh>
+                    <th scope="col" style={{ textAlign: "right" }}>
+                      Actions
+                    </th>
                   </tr>
                 </TableHead>
                 <TableBody>
-                  {visibleTasks.map((task) => (
+                  {list.visible.map((task) => (
                     <tr key={task.id}>
                       <td>{task.title}</td>
                       <td>
@@ -200,14 +189,7 @@ export function TasksPage() {
                             size="sm"
                             variant="ghost"
                             leftIcon={<IconCheck size={16} />}
-                            onClick={() => {
-                              toggleDone(task.id);
-                              toast.success(
-                                task.status === "done"
-                                  ? "Task reopened"
-                                  : "Task completed",
-                              );
-                            }}>
+                            onClick={() => toggleDone(task)}>
                             {task.status === "done" ? "Reopen" : "Complete"}
                           </Button>
                           <ConfirmButton
@@ -215,7 +197,7 @@ export function TasksPage() {
                             label="Delete"
                             title="Delete task?"
                             message={`"${task.title}" will be removed from the list.`}
-                            onConfirm={() => handleDelete(task.id)}
+                            onConfirm={() => handleDelete(task)}
                           />
                         </Stack>
                       </td>
@@ -225,31 +207,33 @@ export function TasksPage() {
               </Table>
             </div>
           ) : (
-            <EmptyState
+            <ListEmptyState
+              list={list}
+              noun="task"
               icon={<IconClipboardList size={28} />}
-              title="No tasks found"
-              description="Try a different search term or filter."
+              onCreate={() => openForm(null)}
+              createLabel="New task"
             />
           )}
 
-          {pageCount > 1 && (
-            <div className="list-pagination">
-              <Pagination
-                currentPage={currentPage}
-                totalPages={pageCount}
-                onPageChange={setPage}
-              />
-            </div>
-          )}
+          <ListPagination list={list} noun="task" />
         </Card>
       </GridItem>
 
-      <TaskFormModal
-        open={formOpen}
-        task={editingTask}
-        onClose={() => setFormOpen(false)}
-        onSave={handleSave}
-      />
+      {/* Rendered only while open so the form starts clean each time. */}
+      {formOpen && (
+        <TaskFormModal
+          open
+          task={editingTask}
+          onClose={() => {
+            setFormOpen(false);
+            setEditingTask(null);
+          }}
+          onSave={handleSave}
+        />
+      )}
+
+      <UndoBar undo={undo} />
     </Grid>
   );
 }

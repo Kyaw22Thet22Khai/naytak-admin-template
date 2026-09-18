@@ -1,5 +1,11 @@
-import { useEffect, useState } from "react";
-import { Outlet, useHref, useLocation, useNavigate } from "react-router-dom";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import {
+  Link,
+  Outlet,
+  useHref,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import {
   Avatar,
   Button,
@@ -13,36 +19,36 @@ import {
   IconKey,
   IconLogout,
   IconMenu,
-  IconMoon,
-  IconSun,
   IconUser,
   Stack,
-  useTheme,
   useToast,
 } from "naytak-react-ui";
 import { NAV_ITEMS, ROUTES } from "../app/routes";
-import { APP_NAME, CURRENT_USER } from "../constants/app";
+import { APP_NAME } from "../constants/app";
+import { ThemeToggle } from "../components/themeToggle";
+import { useAuth } from "../app/authContext";
 import { NOTIFICATIONS } from "../constants/notifications";
 import { NotificationPanel } from "../components/notificationPanel";
 import { NotificationsModal } from "../components/notificationsModal";
-import { NaytakLoader } from "../components/naytakLoader";
+import { useLocalStorage } from "../hooks/useLocalStorage";
+import { useIsMobile } from "../hooks/useMediaQuery";
+import { useFocusTrap, useScrollLock } from "../hooks/useFocusTrap";
+import { PageSkeleton } from "../components/listSkeleton";
 import { downloadProjectSource } from "../utils/exportPage";
 import logo from "../assets/logo.svg";
 import "./adminLayout.css";
 
-/** How long the page-transition loader stays visible (ms). */
-const PAGE_TRANSITION_MS = 300;
-
 /**
  * Admin shell rendered around every page.
  * DashboardLayout provides the sidebar, navbar, breadcrumb and content area;
- * page content is rendered into the <Outlet />.
+ * page content renders into the <Outlet />.
  */
 export function AdminLayout() {
-  const { mode, toggleMode } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   const toast = useToast();
+  const isMobile = useIsMobile();
+  const { user, signOut } = useAuth();
 
   // Current page — used for the breadcrumb and as the title of downloaded files.
   const currentItem = NAV_ITEMS.find((item) => location.pathname === item.path);
@@ -50,28 +56,31 @@ export function AdminLayout() {
   // Basename-aware href for the breadcrumb "Home" link (BrowserRouter).
   const homeHref = useHref("/");
 
-  // Notification bell state (navbar).
-  const [notifications, setNotifications] = useState(NOTIFICATIONS);
+  // Notification state, persisted so "mark as read" survives a reload.
+  const [notifications, setNotifications] = useLocalStorage(
+    "notifications",
+    NOTIFICATIONS,
+  );
   const [notifOpen, setNotifOpen] = useState(false);
   const [viewAllOpen, setViewAllOpen] = useState(false);
 
-  // Mobile sidebar drawer state — on small screens the sidebar slides in as
-  // an off-canvas drawer (see AdminLayout.css).
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  // Desktop sidebar collapse, remembered between visits.
+  const [collapsed, setCollapsed] = useLocalStorage("sidebar-collapsed", false);
 
-  // Page-transition loader — every route change through this shell shows a
-  // brief loading state before the new page's data appears.
-  const [loadedPath, setLoadedPath] = useState(location.pathname);
-  const pageTransitioning = loadedPath !== location.pathname;
+  /**
+   * Mobile off-canvas drawer (see adminLayout.css).
+   *
+   * Openness is derived rather than stored: we remember which path the drawer
+   * was opened on, so navigating away or widening past the breakpoint closes
+   * it for free, with no effects to keep in sync.
+   */
+  const [openedOnPath, setOpenedOnPath] = useState(null);
+  const mobileNavOpen = isMobile && openedOnPath === location.pathname;
+  const closeMobileNav = useCallback(() => setOpenedOnPath(null), []);
+  const drawerRef = useFocusTrap(mobileNavOpen, closeMobileNav);
+  useScrollLock(mobileNavOpen);
 
-  useEffect(() => {
-    if (loadedPath === location.pathname) return;
-    const timer = window.setTimeout(
-      () => setLoadedPath(location.pathname),
-      PAGE_TRANSITION_MS,
-    );
-    return () => window.clearTimeout(timer);
-  }, [location.pathname, loadedPath]);
+  const shellRef = useRef(null);
 
   const unreadCount = notifications.filter((n) => n.unread).length;
 
@@ -80,46 +89,53 @@ export function AdminLayout() {
     toast.success("All notifications marked as read");
   };
 
-  const markRead = (id) => {
+  const markRead = (id) =>
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, unread: false } : n)),
     );
-  };
 
-  // The sidebar's own collapse toggle is hidden (see AdminLayout.css); the
-  // hamburger in the navbar drives it by triggering the library toggler so
-  // the sidebar keeps its internal collapse state. On mobile the sidebar is an
-  // off-canvas drawer, so the hamburger toggles the drawer instead.
-  const isMobileView = () => window.matchMedia("(max-width: 768px)").matches;
-
+  /**
+   * The library Sidebar owns its collapsed state internally and exposes no
+   * controlled prop, so the navbar hamburger drives it through its own toggler
+   * button. The query is scoped to this shell subtree rather than the whole
+   * document, and the mirrored `collapsed` value here is what gets persisted.
+   */
   const toggleSidebar = () => {
-    if (isMobileView()) {
-      setMobileNavOpen((open) => !open);
-    } else {
-      document.querySelector(".sidebar-toggler")?.click();
+    if (isMobile) {
+      setOpenedOnPath(mobileNavOpen ? null : location.pathname);
+      return;
     }
+    const toggler = shellRef.current?.querySelector(".sidebar-toggler");
+    if (!toggler) {
+      console.warn(
+        "Sidebar toggler not found — naytak-react-ui markup may have changed.",
+      );
+      return;
+    }
+    toggler.click();
+    setCollapsed((prev) => !prev);
   };
 
-  // Reflect the mobile drawer state as a class on the shell so CSS can slide
-  // the sidebar in/out on small screens.
+  // Reflect the drawer state as a class so CSS can slide the sidebar in/out.
   useEffect(() => {
-    const dashboard = document.querySelector(".dashboard");
-    if (!dashboard) return;
-    dashboard.classList.toggle("mobile-nav-open", mobileNavOpen);
+    const dashboard = shellRef.current?.querySelector(".dashboard");
+    dashboard?.classList.toggle("mobile-nav-open", mobileNavOpen);
   }, [mobileNavOpen]);
 
   const sidebarToggle = (
     <Button
       variant="ghost"
       size="sm"
-      aria-label="Toggle sidebar"
+      aria-label={mobileNavOpen ? "Close navigation" : "Open navigation"}
+      aria-expanded={isMobile ? mobileNavOpen : !collapsed}
+      aria-controls="admin-sidebar"
       leftIcon={<IconMenu size={20} />}
       onClick={toggleSidebar}
     />
   );
 
   const sidebar = (
-    <>
+    <div id="admin-sidebar" ref={drawerRef}>
       <div className="sidebar-brand">
         <img
           src={logo}
@@ -130,36 +146,33 @@ export function AdminLayout() {
       </div>
       {NAV_ITEMS.map((item) => {
         const Icon = item.icon;
+        const active = location.pathname === item.path;
         return (
           <SidebarItem
             key={item.key}
             label={item.label}
             icon={<Icon size={20} />}
-            active={location.pathname === item.path}
-            onClick={() => {
-              navigate(item.path);
-              if (isMobileView()) setMobileNavOpen(false);
-            }}
+            active={active}
+            aria-current={active ? "page" : undefined}
+            onClick={() => navigate(item.path)}
           />
         );
       })}
-    </>
+    </div>
   );
 
-  // Profile dropdown items. TODO: wire Profile / Reset Password to real routes
-  // once those pages exist; for now they show a placeholder toast.
   const profileMenuItems = [
     {
       key: "profile",
       label: "Profile",
       icon: <IconUser size={16} />,
-      onClick: () => toast.info("Profile page coming soon"),
+      onClick: () => navigate(ROUTES.profile),
     },
     {
       key: "reset-password",
       label: "Reset Password",
       icon: <IconKey size={16} />,
-      onClick: () => toast.info("Password reset coming soon"),
+      onClick: () => navigate(ROUTES.forgotPassword),
     },
     { key: "divider-1", divider: true },
     {
@@ -168,8 +181,9 @@ export function AdminLayout() {
       icon: <IconLogout size={16} />,
       danger: true,
       onClick: () => {
+        signOut();
         toast.success("Signed out");
-        navigate(ROUTES.login);
+        navigate(ROUTES.login, { replace: true });
       },
     },
   ];
@@ -213,38 +227,36 @@ export function AdminLayout() {
             <Button
               variant="ghost"
               size="sm"
-              aria-label={`Notifications (${unreadCount} unread)`}
+              aria-label={`Notifications, ${unreadCount} unread`}
+              aria-expanded={notifOpen}
               leftIcon={<IconBell size={20} />}
             />
             {unreadCount > 0 && (
-              <span className="navbar-bell__badge">{unreadCount}</span>
+              <span className="navbar-bell__badge" aria-hidden="true">
+                {unreadCount}
+              </span>
             )}
           </span>
         </Popover>
+        <ThemeToggle />
         <Button
           variant="ghost"
           size="sm"
-          aria-label="Toggle color mode"
-          leftIcon={
-            mode === "dark" ? <IconSun size={20} /> : <IconMoon size={20} />
-          }
-          onClick={toggleMode}
-        />
-        <Button
-          variant="ghost"
-          size="sm"
-          aria-label="Download project"
+          aria-label="Download project source"
           className="download-btn"
           leftIcon={<IconDownload size={20} />}
           onClick={handleDownload}>
           <span className="download-btn__label">Download</span>
         </Button>
         <DropdownMenu items={profileMenuItems} align="end">
-          <div className="profile-trigger" aria-label="Account menu">
-            <Avatar size="sm" text={CURRENT_USER.name} />
-            <span className="profile-trigger__name">{CURRENT_USER.name}</span>
+          <button
+            type="button"
+            className="profile-trigger"
+            aria-label="Account menu">
+            <Avatar size="sm" text={user?.name ?? "User"} />
+            <span className="profile-trigger__name">{user?.name}</span>
             <IconChevronDown size={16} className="profile-trigger__chevron" />
-          </div>
+          </button>
         </DropdownMenu>
       </Stack>
     </>
@@ -256,36 +268,50 @@ export function AdminLayout() {
   ];
 
   return (
-    <DashboardLayout
-      title=""
-      sidebar={sidebar}
-      navbarActions={navbarActions}
-      breadcrumbItems={breadcrumbItems}
-      footer={`${APP_NAME} © ${new Date().getFullYear()}`}>
-      {pageTransitioning ? (
-        <NaytakLoader label="Loading" />
-      ) : (
-        <div className="page-transition-content">
-          <Outlet />
-        </div>
-      )}
+    <div ref={shellRef} className="admin-shell">
+      {/* Lets keyboard users jump past the sidebar and navbar. */}
+      <a className="skip-link" href="#main-content">
+        Skip to main content
+      </a>
 
-      {/* Tap-away scrim behind the mobile sidebar drawer. */}
-      {mobileNavOpen && (
-        <div
-          className="mobile-nav-scrim"
-          onClick={() => setMobileNavOpen(false)}
-          aria-hidden="true"
+      <DashboardLayout
+        title=""
+        sidebar={sidebar}
+        collapsed={collapsed}
+        navbarActions={navbarActions}
+        breadcrumbItems={breadcrumbItems}
+        footer={
+          <>
+            {APP_NAME} © {new Date().getFullYear()} ·{" "}
+            <Link to={ROUTES.landing}>Landing</Link>
+          </>
+        }>
+        {/* The boundary sits here, not above the shell: the sidebar, navbar
+            and breadcrumb stay on screen while the next page's chunk loads,
+            and only the content area fills in. */}
+        <main id="main-content" tabIndex={-1}>
+          <Suspense fallback={<PageSkeleton />}>
+            <Outlet />
+          </Suspense>
+        </main>
+
+        {/* Tap-away scrim behind the mobile sidebar drawer. */}
+        {mobileNavOpen && (
+          <div
+            className="mobile-nav-scrim"
+            onClick={closeMobileNav}
+            aria-hidden="true"
+          />
+        )}
+
+        <NotificationsModal
+          open={viewAllOpen}
+          notifications={notifications}
+          onClose={() => setViewAllOpen(false)}
+          onRead={markRead}
+          onMarkAllRead={markAllRead}
         />
-      )}
-
-      <NotificationsModal
-        open={viewAllOpen}
-        notifications={notifications}
-        onClose={() => setViewAllOpen(false)}
-        onRead={markRead}
-        onMarkAllRead={markAllRead}
-      />
-    </DashboardLayout>
+      </DashboardLayout>
+    </div>
   );
 }

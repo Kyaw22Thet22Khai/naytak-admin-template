@@ -18,6 +18,12 @@ import {
 } from "naytak-react-ui";
 import { useDocumentTitle } from "../../hooks/useDocumentTitle";
 import { PageHeader } from "../../components/pageHeader";
+import { downloadCsv } from "../../utils/exportCsv";
+import {
+  CHART_HEIGHT,
+  FUNNEL_CHART_HEIGHT,
+  SQUARE_CHART_MAX,
+} from "../../constants/charts";
 import {
   ANALYTICS_STATS,
   CONVERSION,
@@ -25,14 +31,18 @@ import {
   REGION_SALES,
   VISITOR_SERIES,
 } from "./data/mock";
+import { withNote } from "../../components/titleNote";
 
-// Professional muted palette — matches the Dashboard widget cards.
+/**
+ * Chart palette, matching the Dashboard widget cards. Pulled from the theme
+ * variables so charts follow the brand colour and both colour modes.
+ */
 const PALETTE = {
-  primary: "#2563eb",
-  info: "#0ea5e9",
-  warning: "#f59e0b",
-  success: "#10b981",
-  danger: "#ef4444",
+  primary: "var(--naytak-primary, #2563eb)",
+  info: "var(--naytak-info)",
+  warning: "var(--naytak-warning)",
+  success: "var(--naytak-success)",
+  danger: "var(--naytak-danger)",
 };
 
 const ICONS = {
@@ -46,12 +56,64 @@ export function AnalyticsPage() {
   useDocumentTitle("Analytics");
   const toast = useToast();
 
+  // Flattens the page's figures into one CSV, so "Export report" hands over
+  // the numbers on screen rather than an apology.
+  const handleExport = () => {
+    const rows = [
+      ...ANALYTICS_STATS.map((stat) => ({
+        section: "Overview",
+        label: stat.label,
+        value: stat.value,
+        change: `${stat.trend > 0 ? "+" : ""}${stat.trend}%`,
+      })),
+      ...VISITOR_SERIES.map((point) => ({
+        section: "Visitors",
+        label: point.x,
+        value: point.y,
+        change: "",
+      })),
+      ...LEAD_FUNNEL.map((step) => ({
+        section: "Lead funnel",
+        label: step.label,
+        value: step.value,
+        change: "",
+      })),
+      ...REGION_SALES.flatMap((region) =>
+        region.data.map((point) => ({
+          section: `Sales · ${region.name}`,
+          label: point.x,
+          value: point.y,
+          change: "",
+        })),
+      ),
+      {
+        section: "Conversion",
+        label: "Conversion rate",
+        value: `${CONVERSION.value}%`,
+        change: "",
+      },
+    ];
+    downloadCsv(
+      `analytics-${new Date().toISOString().slice(0, 10)}.csv`,
+      [
+        { key: "section", label: "Section" },
+        { key: "label", label: "Metric" },
+        { key: "value", label: "Value" },
+        { key: "change", label: "Change" },
+      ],
+      rows,
+    );
+    toast.success("Analytics report exported");
+  };
+
   return (
     <Grid container fluid>
       <GridItem xs={12} spacing={2} className="mb-3">
         <PageHeader
-          title="Analytics"
-          subtitle="Traffic, conversion and revenue insights"
+          title={withNote(
+            "Analytics",
+            "Traffic, conversion and revenue insights",
+          )}
           actions={
             <>
               <Badge
@@ -64,7 +126,7 @@ export function AnalyticsPage() {
                 variant="ghost"
                 size="sm"
                 leftIcon={<IconDownload size={15} />}
-                onClick={() => toast.success("Report export coming soon")}>
+                onClick={handleExport}>
                 Export report
               </Button>
             </>
@@ -107,32 +169,37 @@ export function AnalyticsPage() {
         </Grid>
       </GridItem>
 
-      <GridItem xs={12} md={8} spacing={2} className="mb-2">
+      {/* Equal halves across both chart rows, so the page reads as a grid
+          rather than four panels of arbitrary width. */}
+      <GridItem xs={12} md={6} spacing={2} className="mb-2">
         <Card
-          className="h-100"
-          title="Visitors"
-          subtitle="Unique visitors per month">
+          className="h-100 chart-card"
+          title={withNote("Visitors", "Unique visitors per month")}>
           <LineChart
             data={VISITOR_SERIES}
-            height={300}
+            height={CHART_HEIGHT}
             color="primary"
             fill
             showPoints
+            ariaLabel="Unique visitors per month"
           />
         </Card>
       </GridItem>
 
-      <GridItem xs={12} md={4} spacing={2} className="mb-2">
+      <GridItem xs={12} md={6} spacing={2} className="mb-2">
         <Card
-          className="h-100"
-          title="Conversion Rate"
-          subtitle="Overall visitor → customer">
-          <div style={{ textAlign: "center" }}>
+          className="h-100 chart-card"
+          title={withNote("Conversion Rate", "Overall visitor → customer")}>
+          {/* A gauge has a square viewBox and stretches to its container, so
+              in a half-width card it would render several hundred pixels tall
+              and dwarf the line chart beside it. */}
+          <div className="chart-card__square">
             <GaugeChart
               value={CONVERSION.value}
               max={CONVERSION.max}
               color="success"
-              size={220}
+              size={SQUARE_CHART_MAX}
+              ariaLabel={`Conversion rate ${CONVERSION.value} percent`}
             />
           </div>
         </Card>
@@ -140,19 +207,27 @@ export function AnalyticsPage() {
 
       <GridItem xs={12} md={6} spacing={2} className="mb-2">
         <Card
-          className="h-100"
-          title="Sales by Region"
-          subtitle="Monthly revenue index, Q3">
-          <GroupedBarChart series={REGION_SALES} height={280} showValues />
+          className="h-100 chart-card"
+          title={withNote("Sales by Region", "Monthly revenue index, Q3")}>
+          <GroupedBarChart
+            series={REGION_SALES}
+            height={CHART_HEIGHT}
+            showValues
+            ariaLabel="Monthly revenue index by region"
+          />
         </Card>
       </GridItem>
 
       <GridItem xs={12} md={6} spacing={2}>
         <Card
-          className="h-100"
-          title="Lead Funnel"
-          subtitle="Visitor → paid customer">
-          <FunnelChart data={LEAD_FUNNEL} height={280} showValues />
+          className="h-100 chart-card"
+          title={withNote("Lead Funnel", "Visitor → paid customer")}>
+          <FunnelChart
+            data={LEAD_FUNNEL}
+            height={FUNNEL_CHART_HEIGHT}
+            showValues
+            ariaLabel="Lead funnel from visitor to paid customer"
+          />
         </Card>
       </GridItem>
     </Grid>

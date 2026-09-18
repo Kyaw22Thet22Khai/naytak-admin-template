@@ -5,9 +5,11 @@ import { ghPagesSpaFallback } from "./plugins/ghPagesSpaFallback";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  // Relative base so the built app works when deployed to GitHub Pages
-  // under a sub-path (e.g. https://<user>.github.io/naytak-admin-template/).
-  base: "./",
+  // Deploy sub-path. CI sets VITE_BASE_PATH to "/<repo-name>/" so the app —
+  // and BrowserRouter's basename, which reads import.meta.env.BASE_URL —
+  // work under any fork's GitHub Pages URL without hardcoding a username.
+  // Unset (local dev, `npm run preview`) falls back to a relative base.
+  base: process.env.VITE_BASE_PATH || "./",
   // Generates public/project-source.zip (whole project, no node_modules)
   // so the navbar Download button can offer the runnable project source.
   // ghPagesSpaFallback writes dist/404.html so BrowserRouter deep links
@@ -32,5 +34,10 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: "./src/setupTests.js",
     css: false,
+    // Several suites render the whole app: a sign-in with a simulated network
+    // delay, then a lazily loaded route chunk, then user interaction. That is
+    // comfortably past the 5s default without anything being wrong.
+    testTimeout: 20000,
+    hookTimeout: 20000,
   },
 });

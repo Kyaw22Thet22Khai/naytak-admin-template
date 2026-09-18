@@ -2,6 +2,7 @@
 
 .auth {
   align-items: center;
+  position: relative;
   background:
     radial-gradient(
       900px 480px at 12% -8%,
@@ -17,17 +18,17 @@
   display: flex;
   justify-content: center;
   min-height: 100vh;
-  padding: 24px;
+  padding: var(--space-5);
 }
 
 @media (max-width: 599px) {
   .auth {
-    padding: 16px;
+    padding: var(--space-4);
   }
 }
 
 .auth-card {
-  border-radius: 1rem;
+  border-radius: var(--radius-lg);
   box-shadow: var(--naytak-shadow-lg, 0 16px 40px rgb(30 41 59 / 18%));
   max-width: 400px;
   width: 100%;
@@ -36,15 +37,15 @@
 .auth-card__brand {
   align-items: center;
   display: flex;
-  gap: 10px;
+  gap: var(--space-3);
   justify-content: center;
-  margin-bottom: 20px;
+  margin-bottom: var(--space-5);
 }
 
 .auth-card__logo {
   align-items: center;
-  border-radius: 0.6rem;
-  box-shadow: 0 6px 18px -6px var(--naytak-primary, #2563eb);
+  border-radius: var(--radius-md);
+  box-shadow: var(--naytak-primary-glow, 0 6px 18px -6px var(--naytak-primary));
   display: flex;
   height: 38px;
   justify-content: center;
@@ -59,29 +60,22 @@
 }
 
 .auth-card__appname {
-  font-size: 1.125rem;
+  font-size: var(--text-lg);
   font-weight: 700;
 }
 
 .auth-card__title {
-  font-size: 1.375rem;
+  font-size: var(--text-xl);
   font-weight: 700;
-  margin: 0 0 4px;
-  text-align: center;
-}
-
-.auth-card__subtitle {
-  color: var(--naytak-text-muted, #6b7280);
-  font-size: 0.875rem;
-  margin: 0 0 22px;
+  margin: 0 0 var(--space-1);
   text-align: center;
 }
 
 .auth-card__footer {
   border-top: 1px solid var(--naytak-border, #e5e7eb);
-  font-size: 0.875rem;
-  margin-top: 22px;
-  padding-top: 16px;
+  font-size: var(--text-base);
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
   text-align: center;
 }
 
@@ -95,4 +89,11 @@
 .auth-card__footer a:hover {
   text-decoration: underline;
   text-underline-offset: 2px;
+}
+
+/* Theme switch, pinned to the top-right of the auth screen. */
+.auth__theme-toggle {
+  position: absolute;
+  right: max(1rem, env(safe-area-inset-right, 0px));
+  top: max(1rem, env(safe-area-inset-top, 0px));
 }

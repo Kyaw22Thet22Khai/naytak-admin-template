@@ -1,7 +1,14 @@
 import { Stack } from "naytak-react-ui";
 
-/** Page title row with optional subtitle and action buttons. */
-export function PageHeader({ title, subtitle, actions }) {
+/**
+ * Page title row with action buttons.
+ *
+ * A title and its description are combined by the caller with `withNote`
+ * ("Products (Manage your product catalog)"), which is the same helper the
+ * Card call sites use — so there is one mechanism for it across the app
+ * rather than a special case for whichever component owns the markup.
+ */
+export function PageHeader({ title, actions }) {
   return (
     <Stack
       direction="row"
@@ -9,10 +16,7 @@ export function PageHeader({ title, subtitle, actions }) {
       align="center"
       spacing={16}
       className="page-header">
-      <div>
-        <h2 className="page-header__title">{title}</h2>
-        {subtitle && <p className="page-header__subtitle">{subtitle}</p>}
-      </div>
+      <h2 className="page-header__title">{title}</h2>
       {actions && (
         <Stack direction="row" spacing={8}>
           {actions}

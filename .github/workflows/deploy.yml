@@ -33,6 +33,10 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          # Project sites are served from https://<user>.github.io/<repo>/, so
+          # the built app and the router need that sub-path as their base.
+          VITE_BASE_PATH: /${{ github.event.repository.name }}/
 
       - name: Deploy to gh-pages branch
         uses: peaceiris/actions-gh-pages@v3

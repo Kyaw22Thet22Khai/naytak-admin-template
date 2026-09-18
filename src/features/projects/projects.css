@@ -7,13 +7,13 @@
 .project-card__head {
   align-items: flex-start;
   display: flex;
-  gap: 12px;
+  gap: var(--space-3);
 }
 
 .project-card__icon {
   align-items: center;
   background: var(--naytak-primary-soft, rgba(37, 99, 235, 0.12));
-  border-radius: 0.6rem;
+  border-radius: var(--radius-md);
   color: var(--naytak-primary, #2563eb);
   display: flex;
   flex-shrink: 0;
@@ -23,26 +23,26 @@
 }
 
 .project-card__name {
-  font-size: 1rem;
+  font-size: var(--text-md);
   font-weight: 600;
   margin: 0;
 }
 
 .project-card__description {
   color: var(--naytak-text-muted, #6b7280);
-  font-size: 0.8125rem;
+  font-size: var(--text-sm);
   line-height: 1.45;
-  margin-top: 2px;
+  margin-top: var(--space-1);
 }
 
 .project-card__meta {
   color: var(--naytak-text-muted, #6b7280);
-  font-size: 0.8125rem;
+  font-size: var(--text-sm);
 }
 
 .project-card__team {
   display: flex;
-  margin-top: 12px;
+  margin-top: var(--space-3);
 }
 
 .project-card__team .avatar {
@@ -51,11 +51,17 @@
 }
 
 .project-card__team .avatar + .avatar {
-  margin-left: -8px;
+  margin-left: calc(var(--space-2) * -1);
 }
 
 .project-card__footer {
   border-top: 1px solid var(--naytak-border, #e5e7eb);
-  margin-top: 12px;
-  padding-top: 10px;
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+}
+
+/* Fills the row beside the folder icon without letting long names overflow. */
+.project-card__headbody {
+  flex: 1 1 auto;
+  min-width: 0;
 }

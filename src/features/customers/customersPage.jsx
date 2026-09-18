@@ -1,17 +1,14 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   Avatar,
   Badge,
   Button,
   Card,
-  EmptyState,
   Grid,
   GridItem,
+  IconDownload,
   IconEye,
   IconUserRound,
-  Pagination,
-  SearchInput,
-  Select,
   Stack,
   Table,
   TableBody,
@@ -19,11 +16,20 @@ import {
   useToast,
 } from "naytak-react-ui";
 import { useDocumentTitle } from "../../hooks/useDocumentTitle";
+import { useListState } from "../../hooks/useListState";
+import { useCollection } from "../../app/dataContext";
 import { PageHeader } from "../../components/pageHeader";
+import { ListToolbar, SortableTh } from "../../components/listToolbar";
+import {
+  ListEmptyState,
+  ListPagination,
+  listTitle,
+} from "../../components/listResults";
 import { CustomerDetailModal } from "./components/customerDetailModal";
 import { formatCurrency, formatDate } from "../../utils/format";
+import { withNote } from "../../components/titleNote";
+import { downloadCsv } from "../../utils/exportCsv";
 import {
-  CUSTOMERS,
   SEGMENT_COLORS,
   SEGMENT_LABELS,
   SEGMENT_OPTIONS,
@@ -32,100 +38,109 @@ import {
   STATUS_OPTIONS,
 } from "./data/mock";
 
-const PAGE_SIZE = 8;
+const CSV_COLUMNS = [
+  { key: "name", label: "Name" },
+  { key: "email", label: "Email" },
+  { key: "segment", label: "Segment" },
+  { key: "orders", label: "Orders" },
+  { key: "spent", label: "Total spent" },
+  { key: "lastOrder", label: "Last order" },
+  { key: "status", label: "Status" },
+];
+
+/** Stable list config — useListState memoizes on these identities. */
+const SEARCH_KEYS = ["name", "email"];
+const FILTERS = {
+  segment: (customer, value) => customer.segment === value,
+  status: (customer, value) => customer.status === value,
+};
 
 export function CustomersPage() {
   useDocumentTitle("Customers");
   const toast = useToast();
-
-  const [query, setQuery] = useState("");
-  const [segment, setSegment] = useState("all");
-  const [status, setStatus] = useState("all");
-  const [page, setPage] = useState(1);
+  const customers = useCollection("customers");
   const [selectedCustomer, setSelectedCustomer] = useState(null);
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return CUSTOMERS.filter((customer) => {
-      const matchesQuery =
-        !q ||
-        customer.name.toLowerCase().includes(q) ||
-        customer.email.toLowerCase().includes(q);
-      const matchesSegment = segment === "all" || customer.segment === segment;
-      const matchesStatus = status === "all" || customer.status === status;
-      return matchesQuery && matchesSegment && matchesStatus;
-    });
-  }, [query, segment, status]);
+  const list = useListState({
+    items: customers.items,
+    searchKeys: SEARCH_KEYS,
+    filters: FILTERS,
+    defaultSort: "name",
+    pageSize: 8,
+  });
 
-  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const currentPage = Math.min(page, pageCount);
-  const visibleCustomers = filtered.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE,
-  );
+  // Exports what the user is actually looking at, filters included — an export
+  // that silently ignores the active filters is worse than no export.
+  const handleExport = () => {
+    downloadCsv("customers.csv", CSV_COLUMNS, list.results);
+    toast.success(
+      `Exported ${list.total} customer${list.total === 1 ? "" : "s"} to CSV`,
+    );
+  };
 
   return (
     <Grid container fluid>
       <GridItem xs={12} spacing={2} className="mb-3">
         <PageHeader
-          title="Customers"
-          subtitle="Manage your customer base and segments"
+          title={withNote(
+            "Customers",
+            "Manage your customer base and segments",
+          )}
           actions={
             <Button
               size="sm"
-              leftIcon={<IconEye size={16} />}
-              onClick={() => toast.success("Export coming soon")}>
-              Export
+              leftIcon={<IconDownload size={16} />}
+              disabled={list.total === 0}
+              onClick={handleExport}>
+              Export CSV
             </Button>
           }
         />
       </GridItem>
 
       <GridItem xs={12} spacing={2}>
-        <Card
-          title="All customers"
-          subtitle={`${filtered.length} customer${filtered.length === 1 ? "" : "s"}`}>
-          <Stack direction="row" spacing={8} wrap className="mb-3 list-toolbar">
-            <SearchInput
-              placeholder="Search name or email…"
-              clearable
-              value={query}
-              onChange={setQuery}
+        <Card title={listTitle("All customers", list)}>
+          <div className="mb-3">
+            <ListToolbar
+              list={list}
+              searchPlaceholder="Search name or email…"
+              filters={[
+                { name: "segment", label: "Segment", options: SEGMENT_OPTIONS },
+                { name: "status", label: "Status", options: STATUS_OPTIONS },
+              ]}
             />
-            <Select
-              value={segment}
-              onChange={(e) => {
-                setSegment(e.target.value);
-                setPage(1);
-              }}
-              options={SEGMENT_OPTIONS}
-            />
-            <Select
-              value={status}
-              onChange={(e) => {
-                setStatus(e.target.value);
-                setPage(1);
-              }}
-              options={STATUS_OPTIONS}
-            />
-          </Stack>
+          </div>
 
-          {visibleCustomers.length > 0 ? (
+          {list.visible.length > 0 ? (
             <div className="table-scroll">
               <Table>
                 <TableHead color="primary">
                   <tr>
-                    <th>Customer</th>
-                    <th>Segment</th>
-                    <th>Orders</th>
-                    <th>Total spent</th>
-                    <th>Last order</th>
-                    <th>Status</th>
-                    <th style={{ textAlign: "right" }}>Actions</th>
+                    <SortableTh list={list} field="name">
+                      Customer
+                    </SortableTh>
+                    <SortableTh list={list} field="segment">
+                      Segment
+                    </SortableTh>
+                    <SortableTh list={list} field="orders">
+                      Orders
+                    </SortableTh>
+                    <SortableTh list={list} field="spent">
+                      Total spent
+                    </SortableTh>
+                    <SortableTh list={list} field="lastOrder">
+                      Last order
+                    </SortableTh>
+                    <SortableTh list={list} field="status">
+                      Status
+                    </SortableTh>
+                    <th scope="col" style={{ textAlign: "right" }}>
+                      Actions
+                    </th>
                   </tr>
                 </TableHead>
                 <TableBody>
-                  {visibleCustomers.map((customer) => (
+                  {list.visible.map((customer) => (
                     <tr key={customer.id}>
                       <td>
                         <Stack direction="row" spacing={8} align="center">
@@ -172,22 +187,14 @@ export function CustomersPage() {
               </Table>
             </div>
           ) : (
-            <EmptyState
+            <ListEmptyState
+              list={list}
+              noun="customer"
               icon={<IconUserRound size={28} />}
-              title="No customers found"
-              description="Try a different search term or segment filter."
             />
           )}
 
-          {pageCount > 1 && (
-            <div className="list-pagination">
-              <Pagination
-                currentPage={currentPage}
-                totalPages={pageCount}
-                onPageChange={setPage}
-              />
-            </div>
-          )}
+          <ListPagination list={list} noun="customer" />
         </Card>
       </GridItem>
 

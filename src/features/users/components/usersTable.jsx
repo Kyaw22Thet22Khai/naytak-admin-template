@@ -10,6 +10,7 @@ import {
 } from "naytak-react-ui";
 import { formatDate, capitalize } from "../../../utils/format";
 import { ConfirmButton } from "../../../components/confirmButton";
+import { SortableTh } from "../../../components/listToolbar";
 
 const ROLE_COLORS = {
   admin: "danger",
@@ -29,17 +30,27 @@ const STATUS_COLORS = {
   pending: "danger",
 };
 
-export function UsersTable({ users, onEdit, onDelete }) {
+export function UsersTable({ users, list, onEdit, onDelete }) {
   return (
     <div className="table-scroll">
       <Table>
         <TableHead color="primary">
           <tr>
-            <th>User</th>
-            <th>Role</th>
-            <th>Status</th>
-            <th>Joined</th>
-            <th style={{ textAlign: "right" }}>Actions</th>
+            <SortableTh list={list} field="name">
+              User
+            </SortableTh>
+            <SortableTh list={list} field="role">
+              Role
+            </SortableTh>
+            <SortableTh list={list} field="status">
+              Status
+            </SortableTh>
+            <SortableTh list={list} field="joined">
+              Joined
+            </SortableTh>
+            <th scope="col" style={{ textAlign: "right" }}>
+              Actions
+            </th>
           </tr>
         </TableHead>
         <TableBody>

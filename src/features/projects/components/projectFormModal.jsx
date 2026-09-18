@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import {
   Button,
   IconCheck,
@@ -8,6 +7,8 @@ import {
   Stack,
   Textarea,
 } from "naytak-react-ui";
+import { FormField } from "../../../components/formField";
+import { useForm, buildValidator, required } from "../../../hooks/useForm";
 import { STATUS_OPTIONS } from "../data/mock";
 
 /** Form-only status options (exclude the "All statuses" filter entry). */
@@ -22,6 +23,25 @@ const EMPTY_FORM = {
   team: "",
 };
 
+const validate = buildValidator({
+  name: [required("Project name")],
+  due: [required("Due date")],
+  progress: [
+    required("Progress"),
+    (value) => {
+      const parsed = Number(value);
+      if (Number.isNaN(parsed)) return "Progress must be a number.";
+      if (parsed < 0 || parsed > 100)
+        return "Progress must be between 0 and 100.";
+      return undefined;
+    },
+  ],
+  team: [
+    (value) =>
+      String(value).trim() === "" ? "Add at least one team member." : undefined,
+  ],
+});
+
 /**
  * Modal form used to create or edit a project.
  * - `project` = null → "New project" mode (starts empty).
@@ -29,42 +49,33 @@ const EMPTY_FORM = {
  */
 export function ProjectFormModal({ open, project, onClose, onSave }) {
   const isEdit = Boolean(project);
-  const [form, setForm] = useState(EMPTY_FORM);
 
-  // Reset the form whenever the modal opens (fresh or prefilled from `project`).
-  useEffect(() => {
-    if (!open) return;
-    setForm(
-      project
-        ? {
-            name: project.name,
-            description: project.description,
-            status: project.status,
-            progress: String(project.progress),
-            due: project.due,
-            team: project.team.join(", "),
-          }
-        : EMPTY_FORM,
-    );
-  }, [open, project]);
-
-  const setField = (field) => (e) =>
-    setForm((prev) => ({ ...prev, [field]: e.target.value }));
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSave({
-      name: form.name.trim(),
-      description: form.description.trim(),
-      status: form.status,
-      progress: Number(form.progress),
-      due: form.due,
-      team: form.team
-        .split(",")
-        .map((member) => member.trim())
-        .filter(Boolean),
-    });
-  };
+  const form = useForm({
+    // Mounted only while open, so this runs afresh on every open.
+    initialValues: project
+      ? {
+          name: project.name,
+          description: project.description,
+          status: project.status,
+          progress: String(project.progress),
+          due: project.due,
+          team: project.team.join(", "),
+        }
+      : EMPTY_FORM,
+    validate,
+    onSubmit: (values) =>
+      onSave({
+        name: values.name.trim(),
+        description: values.description.trim(),
+        status: values.status,
+        progress: Number(values.progress),
+        due: values.due,
+        team: values.team
+          .split(",")
+          .map((member) => member.trim())
+          .filter(Boolean),
+      }),
+  });
 
   return (
     <Modal
@@ -79,62 +90,84 @@ export function ProjectFormModal({ open, project, onClose, onSave }) {
           <Button
             type="submit"
             form="project-form"
+            loading={form.submitting}
             leftIcon={<IconCheck size={16} />}>
             {isEdit ? "Save changes" : "Create project"}
           </Button>
         </Stack>
       }>
-      <form id="project-form" onSubmit={handleSubmit}>
+      <form id="project-form" onSubmit={form.handleSubmit} noValidate>
         <Stack direction="column" spacing={12}>
-          <Input
-            label="Project name"
-            placeholder="Website Redesign"
-            value={form.name}
-            onChange={setField("name")}
-            required
-          />
+          <FormField error={form.errors.name}>
+            <Input
+              id="name"
+              name="name"
+              label="Project name"
+              placeholder="Website Redesign"
+              value={form.values.name}
+              onChange={form.handleChange("name")}
+              onBlur={form.handleBlur("name")}
+            />
+          </FormField>
+
           <Textarea
             label="Description"
+            aria-label="Description"
             placeholder="What is this project about?"
-            value={form.description}
-            onChange={setField("description")}
+            value={form.values.description}
+            onChange={form.handleChange("description")}
             rows={3}
             autoResize
           />
+
           <Stack direction="row" spacing={12} wrap>
-            <div style={{ flex: "1 1 150px" }}>
+            <div className="field-grow">
               <Select
                 label="Status"
+                aria-label="Status"
                 options={FORM_STATUS_OPTIONS}
-                value={form.status}
-                onChange={setField("status")}
+                value={form.values.status}
+                onChange={form.handleChange("status")}
               />
             </div>
-            <div style={{ flex: "1 1 150px" }}>
+            <FormField error={form.errors.progress} className="field-grow">
               <Input
+                id="progress"
+                name="progress"
                 label="Progress (%)"
                 type="number"
                 min={0}
                 max={100}
-                value={form.progress}
-                onChange={setField("progress")}
+                value={form.values.progress}
+                onChange={form.handleChange("progress")}
+                onBlur={form.handleBlur("progress")}
               />
-            </div>
-            <div style={{ flex: "1 1 160px" }}>
+            </FormField>
+            <FormField error={form.errors.due} className="field-grow">
               <Input
+                id="due"
+                name="due"
                 label="Due date"
                 type="date"
-                value={form.due}
-                onChange={setField("due")}
+                value={form.values.due}
+                onChange={form.handleChange("due")}
+                onBlur={form.handleBlur("due")}
               />
-            </div>
+            </FormField>
           </Stack>
-          <Input
-            label="Team members"
-            placeholder="Alice Johnson, Bob Smith"
-            value={form.team}
-            onChange={setField("team")}
-          />
+
+          <FormField error={form.errors.team}>
+            <Input
+              id="team"
+              name="team"
+              label="Team members"
+              placeholder="Alice Johnson, Bob Smith"
+              helperText="Separate names with commas."
+              value={form.values.team}
+              onChange={form.handleChange("team")}
+              onBlur={form.handleBlur("team")}
+            />
+          </FormField>
         </Stack>
       </form>
     </Modal>

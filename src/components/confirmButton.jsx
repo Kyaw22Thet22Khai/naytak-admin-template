@@ -11,7 +11,7 @@ export function ConfirmButton({
   icon = <IconTrash size={16} />,
   variant = "danger",
   title = "Delete",
-  message = "This action cannot be undone.",
+  message = "You can undo this straight afterwards.",
   confirmText = "Yes, Delete!",
   cancelText = "No, keep it.",
   color = "danger",
