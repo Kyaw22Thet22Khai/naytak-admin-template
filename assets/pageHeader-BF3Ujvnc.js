@@ -1,0 +1,1 @@
+import{q as e,S as r}from"./index-BkMXhq-a.js";function n({title:s,actions:a}){return e.jsxs(r,{direction:"row",justify:"space-between",align:"center",spacing:16,className:"page-header",children:[e.jsx("h2",{className:"page-header__title",children:s}),a&&e.jsx(r,{direction:"row",spacing:8,children:a})]})}export{n as P};

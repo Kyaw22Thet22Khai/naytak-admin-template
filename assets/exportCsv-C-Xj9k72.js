@@ -1,0 +1,2 @@
+function d(e){if(e==null)return"";const n=String(e);return/[",\n\r]/.test(n)?`"${n.replace(/"/g,'""')}"`:n}function a(e,n){const c=e.map(o=>d(o.label)).join(","),r=n.map(o=>e.map(t=>d(o[t.key])).join(","));return[c,...r].join(`\r
+`)}function l(e,n,c){const r=new Blob(["\uFEFF",a(n,c)],{type:"text/csv;charset=utf-8;"}),o=URL.createObjectURL(r),t=document.createElement("a");t.href=o,t.download=e,document.body.appendChild(t),t.click(),t.remove(),URL.revokeObjectURL(o)}export{l as d};
