@@ -1,4 +1,4 @@
-import { copyFileSync } from "node:fs";
+import { copyFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
 
 /**
@@ -19,12 +19,17 @@ export function ghPagesSpaFallback() {
       outDir = config.build.outDir;
     },
     closeBundle() {
+      const buildDir = resolve(root, outDir);
+      const index = resolve(buildDir, "index.html");
+
+      // closeBundle still runs when the bundle failed, and then there is no
+      // index.html to copy. Reporting an ENOENT here buries the real build
+      // error under a louder, unrelated one — which is exactly what happened
+      // while debugging a failing CI build.
+      if (!existsSync(index)) return;
+
       try {
-        const buildDir = resolve(root, outDir);
-        copyFileSync(
-          resolve(buildDir, "index.html"),
-          resolve(buildDir, "404.html"),
-        );
+        copyFileSync(index, resolve(buildDir, "404.html"));
       } catch (error) {
         console.warn("[ghPagesSpaFallback] failed to write 404.html:", error);
       }
